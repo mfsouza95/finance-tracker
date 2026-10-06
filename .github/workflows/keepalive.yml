@@ -29,7 +29,7 @@ jobs:
           code=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
             -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" \
-            "${SUPABASE_URL%/}/rest/v1/profiles?select=id&limit=1")
+            "${SUPABASE_URL%/}/rest/v1/profiles?select=user_id&limit=1")
           echo "HTTP $code"
           case "$code" in
             2*) ;;
