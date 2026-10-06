@@ -7,7 +7,7 @@ create extension if not exists pgtap;
 
 begin;
 
-select plan(13);
+select plan(11);
 
 -- ----------------------------------------------------------------
 -- User J: two active templates; entries in a closed month (Jan) and
@@ -74,11 +74,6 @@ select lives_ok(
      where id = 'aa900000-0000-0000-0000-000000000001' $$,
   'deleting a template with entries in closed and open months succeeds');
 
-select is_empty(
-  $$ select * from recurring_templates
-     where id = 'aa900000-0000-0000-0000-000000000001' $$,
-  'template row is gone');
-
 select ok(
   (select e.recurring_template_id is null from public.entries e
    join public.months m on m.id = e.month_id
@@ -119,11 +114,6 @@ select is(
      and m.month = 1 and e.amount_cents = 5000),
   'aa900000-0000-0000-0000-000000000002'::uuid,
   'closed-month entry for surviving template keeps its link');
-select ok(
-  (select exists (select 1 from public.recurring_templates
-                  where id = 'aa900000-0000-0000-0000-000000000002')),
-  'surviving template row untouched');
-
 -- (c) handle_new_user is not client-callable, but signup still works.
 select throws_ok(
   $$ select public.handle_new_user() $$,

@@ -39,8 +39,9 @@ export function AppLayout() {
             {(
               [
                 ['/', 'Mês'],
-                ['/historico', 'Histórico'],
+                ['/reservas', 'Reservas'],
                 ['/cofrinhos', 'Cofrinhos'],
+                ['/historico', 'Histórico'],
               ] as const
             )
               .filter(([to]) => to !== pathname)

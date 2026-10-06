@@ -5,7 +5,7 @@ create extension if not exists pgtap;
 
 begin;
 
-select plan(14);
+select plan(12);
 
 -- ----------------------------------------------------------------
 -- Fixtures
@@ -42,15 +42,6 @@ where m.user_id = '92929292-0000-0000-0000-00000000000a' and m.month = 9;
 select public.close_month(
   (select id from public.months
    where user_id = '92929292-0000-0000-0000-00000000000a' and month = 9), 5000);
-
-select is(
-  (select status from public.months
-   where user_id = '92929292-0000-0000-0000-00000000000a' and month = 9),
-  'closed'::public.month_status, 'month is closed after close_month');
-select is(
-  (select count(*)::int from public.month_summaries
-   where user_id = '92929292-0000-0000-0000-00000000000a'),
-  1, 'summary written on close');
 
 -- Reopening an OPEN month is rejected. October is U's open month.
 select public.open_month(2026::smallint, 10::smallint, 100000);

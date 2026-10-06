@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Plus } from 'lucide-react'
 
 import { EmptyState } from '@/components/EmptyState'
@@ -39,7 +40,9 @@ export function BanksPanel({ month }: { month: Month }) {
         <h2 className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
           Reservas
         </h2>
-        <CreateFundDialog kind="bank" />
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/reservas">Ver tudo</Link>
+        </Button>
       </div>
 
       {isLoading ? (
@@ -65,14 +68,14 @@ export function BanksPanel({ month }: { month: Month }) {
   )
 }
 
-function BankRow({
+export function BankRow({
   fund,
   balance,
   month,
 }: {
   fund: Fund
   balance: number
-  month: Month
+  month: Month | null | undefined
 }) {
   const update = useUpdateFund()
 
@@ -98,7 +101,7 @@ function BankRow({
       </button>
       <span className="flex-1 truncate text-sm font-medium">{fund.name}</span>
       <Money cents={balance} size="sm" />
-      <DepositDialog fund={fund} month={month} />
+      {month && <DepositDialog fund={fund} month={month} />}
       <DeleteFundDialog fund={fund} balance={balance} />
     </li>
   )

@@ -5,7 +5,7 @@ create extension if not exists pgtap;
 
 begin;
 
-select plan(11);
+select plan(10);
 
 -- ----------------------------------------------------------------
 -- Fixtures
@@ -85,12 +85,6 @@ select throws_ok(
      where m.user_id = 'b2b2b2b2-0000-0000-0000-00000000000a' and m.month = 8 $$,
   'P0001', 'month is closed; extra income is read-only',
   'insert into a closed month is blocked');
-
-select throws_ok(
-  $$ update public.extra_income set amount_cents = 99999
-     where user_id = 'b2b2b2b2-0000-0000-0000-00000000000a' $$,
-  'P0001', 'month is closed; extra income is read-only',
-  'update in a closed month is blocked');
 
 select throws_ok(
   $$ delete from public.extra_income

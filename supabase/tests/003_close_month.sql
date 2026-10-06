@@ -4,7 +4,7 @@ create extension if not exists pgtap;
 
 begin;
 
-select plan(35);
+select plan(26);
 
 -- ----------------------------------------------------------------
 -- Fixtures: three users
@@ -68,76 +68,21 @@ select lives_ok(
         and year = 2026 and month = 3), 2503) $$,
   'close_month succeeds');
 
-select is(
-  (select ms.net_income_cents from public.month_summaries ms
-   join public.months m on m.id = ms.month_id
-   where m.year = 2026 and m.month = 3
-     and ms.user_id = 'dddddddd-0000-0000-0000-00000000000d'),
-  10003::bigint, 'summary stores net income');
-
-select is(
-  (select essential_budget_cents from public.month_summaries ms
-   join public.months m on m.id = ms.month_id
-   where m.year = 2026 and m.month = 3
-     and ms.user_id = 'dddddddd-0000-0000-0000-00000000000d'),
-  5001::bigint, 'essential budget = floor(net * 50/100)');
-
-select is(
-  (select fun_budget_cents from public.month_summaries ms
-   join public.months m on m.id = ms.month_id
-   where m.year = 2026 and m.month = 3
-     and ms.user_id = 'dddddddd-0000-0000-0000-00000000000d'),
-  3000::bigint, 'fun budget = floor(net * 30/100)');
-
-select is(
-  (select invest_target_cents from public.month_summaries ms
-   join public.months m on m.id = ms.month_id
-   where m.year = 2026 and m.month = 3
-     and ms.user_id = 'dddddddd-0000-0000-0000-00000000000d'),
-  2002::bigint, 'invest target absorbs rounding remainder');
-
-select is(
-  (select essential_budget_cents + fun_budget_cents + invest_target_cents
-   from public.month_summaries ms
-   join public.months m on m.id = ms.month_id
-   where m.year = 2026 and m.month = 3
-     and ms.user_id = 'dddddddd-0000-0000-0000-00000000000d'),
-  10003::bigint, 'three buckets always sum to net');
-
-select is(
-  (select essential_spent_cents from public.month_summaries ms
-   join public.months m on m.id = ms.month_id
-   where m.year = 2026 and m.month = 3
-     and ms.user_id = 'dddddddd-0000-0000-0000-00000000000d'),
-  4000::bigint, 'essential spent sums entries');
-
-select is(
-  (select fun_spent_cents from public.month_summaries ms
-   join public.months m on m.id = ms.month_id
-   where m.year = 2026 and m.month = 3
-     and ms.user_id = 'dddddddd-0000-0000-0000-00000000000d'),
-  3500::bigint, 'fun spent sums entries');
-
-select is(
-  (select essential_rest_cents from public.month_summaries ms
-   join public.months m on m.id = ms.month_id
-   where m.year = 2026 and m.month = 3
-     and ms.user_id = 'dddddddd-0000-0000-0000-00000000000d'),
-  1001::bigint, 'essential rest = budget - spent');
-
-select is(
-  (select fun_rest_cents from public.month_summaries ms
-   join public.months m on m.id = ms.month_id
-   where m.year = 2026 and m.month = 3
-     and ms.user_id = 'dddddddd-0000-0000-0000-00000000000d'),
-  (-500)::bigint, 'fun rest goes negative when overspent');
-
-select is(
-  (select ms.invested_cents from public.month_summaries ms
-   join public.months m on m.id = ms.month_id
-   where m.year = 2026 and m.month = 3
-     and ms.user_id = 'dddddddd-0000-0000-0000-00000000000d'),
-  2503::bigint, 'invested stored as confirmed by user');
+-- Whole summary row in one shot: budgets floor, spends sum the month's
+-- entries, rests keep their sign, invest absorbs rounding and sums to net.
+select results_eq(
+  $$ select ms.net_income_cents, ms.essential_budget_cents,
+            ms.essential_spent_cents, ms.essential_rest_cents,
+            ms.fun_budget_cents, ms.fun_spent_cents, ms.fun_rest_cents,
+            ms.invest_target_cents, ms.invested_cents
+     from public.month_summaries ms
+     join public.months m on m.id = ms.month_id
+     where m.year = 2026 and m.month = 3
+       and ms.user_id = 'dddddddd-0000-0000-0000-00000000000d' $$,
+  $$ values (10003::bigint, 5001::bigint, 4000::bigint, 1001::bigint,
+             3000::bigint, 3500::bigint, (-500)::bigint, 2002::bigint,
+             2503::bigint) $$,
+  'summary row: floor budgets, summed spends, signed rests, invested');
 
 select is(
   (select status::text from public.months

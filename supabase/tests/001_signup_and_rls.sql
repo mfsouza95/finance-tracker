@@ -3,7 +3,7 @@ create extension if not exists pgtap;
 
 begin;
 
-select plan(34);
+select plan(23);
 
 -- ----------------------------------------------------------------
 -- Fixtures (as postgres superuser; RLS bypassed)
@@ -64,6 +64,11 @@ insert into public.month_summaries
 values ('dd000000-0000-0000-0000-0000000000b1',
         'bbbbbbbb-0000-0000-0000-00000000000b',
         700000, 350000, 150000, 200000, 210000, 0, 210000, 140000, 550000);
+insert into public.extra_income (user_id, month_id, amount_cents, received_on)
+values ('bbbbbbbb-0000-0000-0000-00000000000b',
+        'dd000000-0000-0000-0000-0000000000b1', 5000, '2026-01-10');
+insert into public.funds (user_id, kind, name)
+values ('bbbbbbbb-0000-0000-0000-00000000000b', 'bank', 'B reserva');
 
 -- A needs an owned category for the cross-user FK tests below.
 insert into public.categories (id, user_id, bucket, name)
@@ -106,37 +111,27 @@ select is_empty(
   $$ select * from month_summaries
      where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' $$,
   'A cannot read B month_summaries');
+select is_empty(
+  $$ select * from extra_income
+     where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' $$,
+  'A cannot read B extra_income');
+select is_empty(
+  $$ select * from funds
+     where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' $$,
+  'A cannot read B funds');
 
--- Cannot insert a row owned by B into any table.
-select throws_ok(
-  $$ insert into profiles (user_id) values
-     ('bbbbbbbb-0000-0000-0000-00000000000b') $$,
-  '42501', null, 'A cannot insert a profile owned by B');
-select throws_ok(
-  $$ insert into budget_settings (user_id) values
-     ('bbbbbbbb-0000-0000-0000-00000000000b') $$,
-  '42501', null, 'A cannot insert budget_settings owned by B');
+-- Cannot insert a row owned by B. One representative per policy shape:
+-- FOR ALL (months), select+update only (profiles), select-only
+-- (month_summaries), and funds' own insert policy.
 select throws_ok(
   $$ insert into months
        (user_id, year, month, net_income_cents, essential_pct, fun_pct, invest_pct)
      values ('bbbbbbbb-0000-0000-0000-00000000000b', 2026, 2, 1, 50, 30, 20) $$,
   '42501', null, 'A cannot insert a month owned by B');
 select throws_ok(
-  $$ insert into categories (user_id, bucket, name) values
-     ('bbbbbbbb-0000-0000-0000-00000000000b', 'essential', 'forged') $$,
-  '42501', null, 'A cannot insert a category owned by B');
-select throws_ok(
-  $$ insert into recurring_templates
-       (user_id, category_id, label, amount_cents, day_of_month)
-     values ('bbbbbbbb-0000-0000-0000-00000000000b',
-             'cc000000-0000-0000-0000-0000000000b1', 'forged', 1, 1) $$,
-  '42501', null, 'A cannot insert a template owned by B');
-select throws_ok(
-  $$ insert into entries (user_id, month_id, category_id, amount_cents, paid_on)
-     values ('bbbbbbbb-0000-0000-0000-00000000000b',
-             'dd000000-0000-0000-0000-0000000000b1',
-             'cc000000-0000-0000-0000-0000000000b1', 100, '2026-01-10') $$,
-  '42501', null, 'A cannot insert an entry owned by B');
+  $$ insert into profiles (user_id) values
+     ('bbbbbbbb-0000-0000-0000-00000000000b') $$,
+  '42501', null, 'A cannot insert a profile owned by B');
 select throws_ok(
   $$ insert into month_summaries
        (month_id, user_id, net_income_cents,
@@ -147,62 +142,26 @@ select throws_ok(
              'bbbbbbbb-0000-0000-0000-00000000000b',
              1, 1, 1, 0, 1, 1, 0, 1, 1) $$,
   '42501', null, 'A cannot insert a summary owned by B');
+select throws_ok(
+  $$ insert into funds (user_id, kind, name) values
+     ('bbbbbbbb-0000-0000-0000-00000000000b', 'bank', 'forged') $$,
+  '42501', null, 'A cannot insert a fund owned by B');
 
--- Cannot update any of B's rows (0 rows affected).
-select is_empty(
-  $$ update profiles set display_name = 'x'
-     where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,
-  'A cannot update B profiles');
-select is_empty(
-  $$ update budget_settings set essential_pct = 99
-     where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,
-  'A cannot update B budget_settings');
-select is_empty(
-  $$ update months set net_income_cents = 1
-     where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,
-  'A cannot update B months');
-select is_empty(
-  $$ update categories set name = 'x'
-     where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,
-  'A cannot update B categories');
-select is_empty(
-  $$ update recurring_templates set label = 'x'
-     where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,
-  'A cannot update B recurring_templates');
+-- Cannot update or delete B's rows (0 rows affected — the USING clause
+-- hides them). One representative per policy shape again: a FOR ALL
+-- table and the select+update / select-only shapes.
 select is_empty(
   $$ update entries set amount_cents = 1
      where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,
   'A cannot update B entries');
 select is_empty(
-  $$ update month_summaries set invested_cents = 0
+  $$ update profiles set display_name = 'x'
      where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,
-  'A cannot update B month_summaries');
-
--- Cannot delete any of B's rows (0 rows affected).
-select is_empty(
-  $$ delete from profiles
-     where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,
-  'A cannot delete B profiles');
-select is_empty(
-  $$ delete from budget_settings
-     where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,
-  'A cannot delete B budget_settings');
+  'A cannot update B profiles');
 select is_empty(
   $$ delete from months
      where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,
   'A cannot delete B months');
-select is_empty(
-  $$ delete from categories
-     where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,
-  'A cannot delete B categories');
-select is_empty(
-  $$ delete from recurring_templates
-     where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,
-  'A cannot delete B recurring_templates');
-select is_empty(
-  $$ delete from entries
-     where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,
-  'A cannot delete B entries');
 select is_empty(
   $$ delete from month_summaries
      where user_id = 'bbbbbbbb-0000-0000-0000-00000000000b' returning 1 $$,

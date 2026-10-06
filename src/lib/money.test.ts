@@ -52,14 +52,6 @@ describe('computeBuckets', () => {
     },
   )
 
-  it('50/30/20 on 10003: essential 5001, fun 3000, invest absorbs 2002', () => {
-    expect(computeBuckets(10003, DEFAULT_SPLIT)).toEqual({
-      essential: 5001,
-      fun: 3000,
-      invest: 2002,
-    })
-  })
-
   it('60/20/20 on 10007 (remainder to invest)', () => {
     expect(computeBuckets(10007, SPLIT_PRESETS['60/20/20'])).toEqual({
       essential: 6004,

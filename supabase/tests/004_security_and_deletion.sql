@@ -9,7 +9,7 @@ create extension if not exists pgtap;
 
 begin;
 
-select plan(30);
+select plan(24);
 
 -- ----------------------------------------------------------------
 -- Fixtures
@@ -59,6 +59,9 @@ select public.close_month(
   (select id from public.months
    where user_id = '70707070-0000-0000-0000-00000000000a' and month = 1), 100000);
 
+insert into public.funds (user_id, kind, name)
+values ('70707070-0000-0000-0000-00000000000a', 'bank', 'G reserva');
+
 -- H keeps a plain open month + entry to verify isolation after G's delete.
 set "request.jwt.claim.sub" = '70707070-0000-0000-0000-00000000000b';
 set "request.jwt.claims" =
@@ -78,37 +81,30 @@ reset role;
 reset "request.jwt.claim.sub";
 reset "request.jwt.claims";
 
--- Account deletion cascades through closed months, entries, summaries.
+-- Account deletion cascades through every user-owned table, closed
+-- months/entries/summaries and funds included.
 delete from auth.users where id = '70707070-0000-0000-0000-00000000000a';
 
 select is(
-  (select count(*)::int from public.profiles
-   where user_id = '70707070-0000-0000-0000-00000000000a'),
-  0, 'account delete removes profiles');
-select is(
-  (select count(*)::int from public.budget_settings
-   where user_id = '70707070-0000-0000-0000-00000000000a'),
-  0, 'account delete removes budget_settings');
-select is(
-  (select count(*)::int from public.categories
-   where user_id = '70707070-0000-0000-0000-00000000000a'),
-  0, 'account delete removes categories');
-select is(
-  (select count(*)::int from public.recurring_templates
-   where user_id = '70707070-0000-0000-0000-00000000000a'),
-  0, 'account delete removes recurring_templates');
-select is(
-  (select count(*)::int from public.months
-   where user_id = '70707070-0000-0000-0000-00000000000a'),
-  0, 'account delete removes closed months');
-select is(
-  (select count(*)::int from public.entries
-   where user_id = '70707070-0000-0000-0000-00000000000a'),
-  0, 'account delete removes entries in closed months');
-select is(
-  (select count(*)::int from public.month_summaries
-   where user_id = '70707070-0000-0000-0000-00000000000a'),
-  0, 'account delete removes month_summaries');
+  (select (select count(*) from public.profiles
+            where user_id = '70707070-0000-0000-0000-00000000000a')
+        + (select count(*) from public.budget_settings
+            where user_id = '70707070-0000-0000-0000-00000000000a')
+        + (select count(*) from public.categories
+            where user_id = '70707070-0000-0000-0000-00000000000a')
+        + (select count(*) from public.recurring_templates
+            where user_id = '70707070-0000-0000-0000-00000000000a')
+        + (select count(*) from public.months
+            where user_id = '70707070-0000-0000-0000-00000000000a')
+        + (select count(*) from public.entries
+            where user_id = '70707070-0000-0000-0000-00000000000a')
+        + (select count(*) from public.month_summaries
+            where user_id = '70707070-0000-0000-0000-00000000000a')
+        + (select count(*) from public.extra_income
+            where user_id = '70707070-0000-0000-0000-00000000000a')
+        + (select count(*) from public.funds
+            where user_id = '70707070-0000-0000-0000-00000000000a')),
+  0::bigint, 'account delete cascades every user table');
 select is(
   (select count(*)::int from public.entries
    where user_id = '70707070-0000-0000-0000-00000000000b'),
