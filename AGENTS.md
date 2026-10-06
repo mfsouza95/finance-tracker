@@ -142,8 +142,9 @@ Parked ideas to be designed together before any implementation. Both touch the m
 
 ## Operations notes
 
-- Supabase free projects pause after 7 days of inactivity: keep a scheduled GitHub Action pinging the prod project every few days.
-- Free tier has no automatic backups: keep a scheduled export and test a restore once.
+- Production deploy steps are in `docs/DEPLOY.md`.
+- Supabase free projects pause after 7 days of inactivity: `.github/workflows/keepalive.yml` pings the prod project every 3 days (needs `SUPABASE_URL` + `SUPABASE_PUBLISHABLE_KEY` secrets).
+- Free tier has no automatic backups: `.github/workflows/backup.yml` dumps weekly to a workflow artifact (needs `SUPABASE_DB_URL`); test a restore once.
 - Free-tier terms change; re-check pricing pages before relying on them.
 
 ## Open decisions

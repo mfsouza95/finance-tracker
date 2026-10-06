@@ -1,0 +1,30 @@
+name: Backup
+
+# Supabase free tier has no automatic backups. Weekly pg_dump uploaded as a
+# workflow artifact. Artifacts expire (default 90 days) — for real money data,
+# download the latest monthly or wire this to private object storage later.
+on:
+  schedule:
+    - cron: '0 4 * * 0'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: supabase/setup-cli@v1
+      - name: Dump prod database
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          supabase db dump --db-url "$SUPABASE_DB_URL" --data-only \
+            -f "backup-$(date +%F).sql"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_id }}
+          path: backup-*.sql
+          retention-days: 90
+          if-no-files-found: error
