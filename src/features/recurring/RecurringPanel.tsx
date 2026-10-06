@@ -277,15 +277,26 @@ function CreateTemplateForm({
           onChange={(e) => setCategoryId(e.target.value)}
         >
           <option value="">Selecionar…</option>
-          <option value={`${UNCAT_PREFIX}essential`}>
-            Sem categoria (Essencial)
-          </option>
-          <option value={`${UNCAT_PREFIX}fun`}>Sem categoria (Diversão)</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name} ({c.bucket === 'essential' ? 'Essencial' : 'Diversão'})
-            </option>
-          ))}
+          <optgroup label="Essencial">
+            <option value={`${UNCAT_PREFIX}essential`}>Sem categoria</option>
+            {categories
+              .filter((c) => c.bucket === 'essential')
+              .map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+          </optgroup>
+          <optgroup label="Diversão">
+            <option value={`${UNCAT_PREFIX}fun`}>Sem categoria</option>
+            {categories
+              .filter((c) => c.bucket === 'fun')
+              .map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+          </optgroup>
         </select>
       </div>
 
