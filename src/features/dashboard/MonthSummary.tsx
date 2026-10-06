@@ -42,7 +42,7 @@ export function MonthSummary({ month }: { month: Month }) {
   return (
     <section
       aria-label="Resumo do mês"
-      className="rounded-lg border border-border bg-card p-4"
+      className="flex h-full flex-col rounded-lg border border-border bg-card p-4"
     >
       <header className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
@@ -98,7 +98,7 @@ export function MonthSummary({ month }: { month: Month }) {
         </div>
       </dl>
 
-      <div className="mt-4 flex gap-2">
+      <div className="mt-auto flex gap-2 pt-4">
         {isOpen ? (
           <>
             <MonthSettingsDialog month={month} />

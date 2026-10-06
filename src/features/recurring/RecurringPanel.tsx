@@ -38,9 +38,11 @@ export function RecurringPanel() {
   const current = currentYearMonth()
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex h-full flex-col gap-3 rounded-lg border border-border bg-card p-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium">Recorrentes</h2>
+        <h2 className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
+          Recorrentes
+        </h2>
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm">

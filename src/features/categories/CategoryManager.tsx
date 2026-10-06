@@ -3,10 +3,13 @@ import { Archive, ArchiveRestore, Tags } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { useSession } from '@/features/auth/useSession'
 
@@ -52,14 +55,23 @@ export function CategoryManager({ bucket, categories }: CategoryManagerProps) {
   }
 
   return (
-    <Collapsible className="mt-4 self-start">
-      <CollapsibleTrigger asChild>
+    <Dialog>
+      <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Tags className="size-4" />
           Gerenciar categorias
         </Button>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="mt-2 flex flex-col gap-2">
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            Categorias — {bucket === 'essential' ? 'Essencial' : 'Diversão'}
+          </DialogTitle>
+          <DialogDescription>
+            Crie, arquive ou restaure categorias deste pote.
+          </DialogDescription>
+        </DialogHeader>
+
         <ul className="flex flex-col gap-1">
           {active.map((c) => (
             <li key={c.id} className="flex items-center gap-2 text-sm">
@@ -115,7 +127,7 @@ export function CategoryManager({ bucket, categories }: CategoryManagerProps) {
             {error}
           </p>
         )}
-      </CollapsibleContent>
-    </Collapsible>
+      </DialogContent>
+    </Dialog>
   )
 }

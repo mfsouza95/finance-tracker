@@ -41,14 +41,17 @@ export function BucketPanel({ month, bucket, title }: BucketPanelProps) {
   const activeCategories = bucketCategories.filter((c) => !c.archived)
 
   return (
-    <section aria-label={title} className="flex flex-col gap-3">
-      <BucketCard
-        title={title}
-        bucket={bucket}
-        budgetCents={budget}
-        spentCents={spent}
-      />
-
+    <BucketCard
+      title={title}
+      bucket={bucket}
+      budgetCents={budget}
+      spentCents={spent}
+      action={
+        isOpen ? (
+          <CategoryManager bucket={bucket} categories={bucketCategories} />
+        ) : undefined
+      }
+    >
       {activeCategories.length === 0 ? (
         <EmptyState
           title="Nenhuma categoria"
@@ -66,10 +69,6 @@ export function BucketPanel({ month, bucket, title }: BucketPanelProps) {
           ))}
         </div>
       )}
-
-      {isOpen && (
-        <CategoryManager bucket={bucket} categories={bucketCategories} />
-      )}
-    </section>
+    </BucketCard>
   )
 }
