@@ -92,3 +92,16 @@ runs with `supabase db reset` if you want a clean slate.
 - [ ] Delete an extra → budget returns to the plain split
 - [ ] Close the month → extras locked; history row shows "extras +R$ X" and fun budget includes them
 - [ ] Reopen → extras editable/deletable again
+
+## 11. Reservas & cofrinhos
+
+- [ ] Reservas panel → Novo: name only → bank appears in the list with the switch on
+- [ ] Reserva ativa card → the new bank shows; with 2+ active banks, ◀/▶ cycle through them (e.g. `1/2`)
+- [ ] Depositar (+ icon): put 100 in Essencial only → a "Reservas" category appears in Essencial with the entry; Essencial Gasto rises 100; bank balance shows 100
+- [ ] Depositar with a split (Essencial + Diversão) → one entry in each bucket, balance = the sum
+- [ ] "Lançar gasto" → the bank's name appears under a Reservas optgroup; log an entry against it → it shows nowhere in Essencial/Diversão, appears in the Reserva ativa card, balance drops
+- [ ] Try to log more than the bank has → rejected ("insufficient fund balance")
+- [ ] Switch the bank off → it disappears from the add-entry select and the Reserva ativa card, stays in the Reservas list
+- [ ] Delete a bank with a balance → dialog offers "move to extras of the current month": accept → extra appears in Extras (fun budget grows); decline → fund gone, money vanishes
+- [ ] /cofrinhos → Novo: name + goal required; progress bar fills as deposits land; ✓ moves it to Concluídos (undo brings it back); delete offers the same extras transfer
+- [ ] Deposit and entries on a closed month are rejected (read-only still holds)

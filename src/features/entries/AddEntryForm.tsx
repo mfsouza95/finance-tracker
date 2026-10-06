@@ -9,6 +9,7 @@ import { parseBrlToCents } from '@/lib/money'
 import type { Month } from '@/features/months/hooks'
 import type { Category } from '@/features/categories/hooks'
 import { useSession } from '@/features/auth/useSession'
+import { useFunds } from '@/features/funds/hooks'
 
 import { useAddEntry } from './hooks'
 
@@ -18,9 +19,14 @@ interface AddEntryFormProps {
   onDone?: () => void
 }
 
+// Bank options use a `fund:` prefix in the select so they can share the
+// category dropdown — the DB keeps them in separate columns.
+const FUND_PREFIX = 'fund:'
+
 export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
   const { session } = useSession()
   const addEntry = useAddEntry()
+  const { data: banks } = useFunds('bank')
 
   const monthPrefix = `${month.year}-${String(month.month).padStart(2, '0')}`
   const schema = z.object({
@@ -45,6 +51,7 @@ export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
   type FormData = z.infer<typeof schema>
 
   const active = categories.filter((c) => !c.archived)
+  const activeBanks = (banks ?? []).filter((b) => b.active)
   const {
     register,
     handleSubmit,
@@ -60,7 +67,7 @@ export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
     },
   })
 
-  if (active.length === 0) {
+  if (active.length === 0 && activeBanks.length === 0) {
     return (
       <p className="text-muted-foreground text-sm">
         Crie uma categoria antes de lançar gastos.
@@ -71,14 +78,17 @@ export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
   const submit = (data: FormData) => {
     const cents = parseBrlToCents(data.amount)
     if (cents === null || !session) return
+    const isFund = data.categoryId.startsWith(FUND_PREFIX)
     addEntry.mutate(
       {
         userId: session.user.id,
         monthId: month.id,
-        categoryId: data.categoryId,
         amountCents: cents,
         paidOn: data.paidOn,
         note: data.note.trim() || undefined,
+        ...(isFund
+          ? { fundId: data.categoryId.slice(FUND_PREFIX.length) }
+          : { categoryId: data.categoryId }),
       },
       {
         onSuccess: () => {
@@ -119,6 +129,15 @@ export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
                 </option>
               ))}
           </optgroup>
+          {activeBanks.length > 0 && (
+            <optgroup label="Reservas">
+              {activeBanks.map((b) => (
+                <option key={b.id} value={`${FUND_PREFIX}${b.id}`}>
+                  {b.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
         </select>
         {errors.categoryId && (
           <p role="alert" className="text-negative text-xs">

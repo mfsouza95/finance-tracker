@@ -31,27 +31,36 @@ export function useAddEntry() {
     mutationFn: async (vars: {
       userId: string
       monthId: string
-      categoryId: string
       amountCents: number
       paidOn: string
       note?: string
+      // A normal entry has categoryId; a bank spend has fundId instead and
+      // bypasses the buckets (fund_flow='out', no category).
+      categoryId?: string
+      fundId?: string
     }) => {
       const { data, error } = await supabase
         .from('entries')
         .insert({
           user_id: vars.userId,
           month_id: vars.monthId,
-          category_id: vars.categoryId,
+          category_id: vars.categoryId ?? null,
           amount_cents: vars.amountCents,
           paid_on: vars.paidOn,
           note: vars.note ?? null,
+          fund_id: vars.fundId ?? null,
+          fund_flow: vars.fundId ? 'out' : null,
         })
         .select()
         .single()
       if (error) throw error
       return data
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['entries'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['entries'] })
+      qc.invalidateQueries({ queryKey: ['fund_entries'] })
+      qc.invalidateQueries({ queryKey: ['fund_balances'] })
+    },
   })
 }
 
@@ -65,6 +74,10 @@ export function useDeleteEntry() {
         .eq('id', entryId)
       if (error) throw error
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['entries'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['entries'] })
+      qc.invalidateQueries({ queryKey: ['fund_entries'] })
+      qc.invalidateQueries({ queryKey: ['fund_balances'] })
+    },
   })
 }

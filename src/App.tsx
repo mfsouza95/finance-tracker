@@ -5,6 +5,7 @@ import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage'
 import { SignInPage } from '@/features/auth/SignInPage'
 import { useSession } from '@/features/auth/useSession'
 import { Dashboard } from '@/features/dashboard/Dashboard'
+import { PiggyPage } from '@/features/funds/PiggyPage'
 import { HistoryPage } from '@/features/history/HistoryPage'
 import { SelectedMonthProvider } from '@/features/months/SelectedMonthProvider'
 
@@ -27,6 +28,7 @@ export default function App() {
           <Route element={<AppLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="historico" element={<HistoryPage />} />
+            <Route path="cofrinhos" element={<PiggyPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

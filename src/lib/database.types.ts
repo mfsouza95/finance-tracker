@@ -51,16 +51,22 @@ export type Database = {
                   ]
                 },"entries": {
                   Row: {
-                    "amount_cents": number,"category_id": string,"created_at": string,"id": string,"installment_index": number | null,"month_id": string,"note": string | null,"paid_on": string,"recurring_template_id": string | null,"user_id": string
+                    "amount_cents": number,"category_id": string | null,"created_at": string,"fund_flow": string | null,"fund_id": string | null,"id": string,"installment_index": number | null,"month_id": string,"note": string | null,"paid_on": string,"recurring_template_id": string | null,"user_id": string
                   }
                   Insert: {
-                    "amount_cents": number,"category_id": string,"created_at"?: string,"id"?: string,"installment_index"?: number | null,"month_id": string,"note"?: string | null,"paid_on": string,"recurring_template_id"?: string | null,"user_id": string
+                    "amount_cents": number,"category_id"?: string | null,"created_at"?: string,"fund_flow"?: string | null,"fund_id"?: string | null,"id"?: string,"installment_index"?: number | null,"month_id": string,"note"?: string | null,"paid_on": string,"recurring_template_id"?: string | null,"user_id": string
                   }
                   Update: {
-                    "amount_cents"?: number,"category_id"?: string,"created_at"?: string,"id"?: string,"installment_index"?: number | null,"month_id"?: string,"note"?: string | null,"paid_on"?: string,"recurring_template_id"?: string | null,"user_id"?: string
+                    "amount_cents"?: number,"category_id"?: string | null,"created_at"?: string,"fund_flow"?: string | null,"fund_id"?: string | null,"id"?: string,"installment_index"?: number | null,"month_id"?: string,"note"?: string | null,"paid_on"?: string,"recurring_template_id"?: string | null,"user_id"?: string
                   }
                   Relationships: [
                     {
+      foreignKeyName: "entries_fund_fkey"
+      columns: ["user_id","fund_id"]
+isOneToOne: false
+      referencedRelation: "funds"
+      referencedColumns: ["user_id","id"]
+    },{
       foreignKeyName: "entries_user_id_category_id_fkey"
       columns: ["user_id","category_id"]
 isOneToOne: false
@@ -98,6 +104,19 @@ isOneToOne: false
       referencedRelation: "months"
       referencedColumns: ["user_id","id"]
     }
+                  ]
+                },"funds": {
+                  Row: {
+                    "achieved_at": string | null,"active": boolean,"created_at": string,"goal_cents": number | null,"id": string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
+                  }
+                  Insert: {
+                    "achieved_at"?: string | null,"active"?: boolean,"created_at"?: string,"goal_cents"?: number | null,"id"?: string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
+                  }
+                  Update: {
+                    "achieved_at"?: string | null,"active"?: boolean,"created_at"?: string,"goal_cents"?: number | null,"id"?: string,"kind"?: Database["public"]['Enums']["fund_kind"],"name"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
                   ]
                 },"month_summaries": {
                   Row: {
@@ -166,7 +185,14 @@ isOneToOne: false
                 }
           }
           Views: {
-            [_ in never]: never
+            "fund_balances": {
+                  Row: {
+                    "balance_cents": number | null,"fund_id": string | null
+                  }
+                  Relationships: [
+                    
+                  ]
+                }
           }
           Functions: {
             "close_month":
@@ -211,6 +237,12 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"delete_fund":
+{ Args: { "p_fund_id": string,"p_move_to_extras"?: boolean }; Returns: undefined
+                           },
+"deposit_to_fund":
+{ Args: { "p_essential_cents"?: number,"p_fun_cents"?: number,"p_fund_id": string,"p_month_id": string,"p_note"?: string,"p_paid_on"?: string }; Returns: undefined
+                           },
 "open_month":
 { Args: { "month": number,"net_income_cents": number,"year": number }; Returns: {
               "closed_at": string | null,
@@ -255,7 +287,7 @@ isOneToOne: false
       } }
           }
           Enums: {
-            "bucket": "essential"|"fun","month_status": "open"|"closed"
+            "bucket": "essential"|"fun","fund_kind": "bank"|"piggy","month_status": "open"|"closed"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -375,7 +407,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "bucket": ["essential", "fun"],"month_status": ["open", "closed"]
+            "bucket": ["essential", "fun"],"fund_kind": ["bank", "piggy"],"month_status": ["open", "closed"]
           }
         }
 } as const

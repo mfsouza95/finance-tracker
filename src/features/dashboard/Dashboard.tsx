@@ -1,3 +1,6 @@
+import { ActiveBankCard } from '@/features/funds/ActiveBankCard'
+import { BanksPanel } from '@/features/funds/BanksPanel'
+import { PiggySummaryCard } from '@/features/funds/PiggySummaryCard'
 import { RecurringPanel } from '@/features/recurring/RecurringPanel'
 import { OpenMonthPrompt } from '@/features/months/OpenMonthPrompt'
 import { useMonth } from '@/features/months/hooks'
@@ -32,6 +35,9 @@ export function Dashboard() {
       <BucketPanel month={month} bucket="essential" title="Essencial" />
       <BucketPanel month={month} bucket="fun" title="Diversão" />
       <RecurringPanel />
+      <BanksPanel month={month} />
+      <ActiveBankCard month={month} />
+      <PiggySummaryCard />
     </div>
   )
 }

@@ -36,15 +36,19 @@ export function AppLayout() {
         center={<MonthNav />}
         actions={
           <>
-            {pathname === '/historico' ? (
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/">Mês</Link>
-              </Button>
-            ) : (
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/historico">Histórico</Link>
-              </Button>
-            )}
+            {(
+              [
+                ['/', 'Mês'],
+                ['/historico', 'Histórico'],
+                ['/cofrinhos', 'Cofrinhos'],
+              ] as const
+            )
+              .filter(([to]) => to !== pathname)
+              .map(([to, label]) => (
+                <Button key={to} variant="ghost" size="sm" asChild>
+                  <Link to={to}>{label}</Link>
+                </Button>
+              ))}
             <Sheet open={addOpen} onOpenChange={setAddOpen}>
               <SheetTrigger asChild>
                 <Button size="sm">
