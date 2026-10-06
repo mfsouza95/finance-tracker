@@ -53,6 +53,16 @@ scheduled jobs (already in `.github/workflows/`).
      test Google sign-in on prod — one credential set works for both if you
      list both callback URLs.
 
+6. Email + password — **Authentication → Sign In / Providers → Email**:
+   - The app has sign-in + create-account built in. Two prod settings to pick:
+   - **Confirm email**: on by default in prod (off locally). On = signup sends
+     a confirmation link and the app shows "confirme o e-mail"; off = signup
+     logs straight in. Either works — off is friendlier for a small group,
+     on is better hygiene.
+   - **Password minimum length**: default 6, matches the form's validation.
+   - Note: signup/confirmation emails go through the same rate-limited free
+     SMTP as magic links — Google sign-in remains the most reliable path.
+
 ## 2. Hosting (pick one)
 
 The app is a static SPA — any static host works. Build command `pnpm build`,
