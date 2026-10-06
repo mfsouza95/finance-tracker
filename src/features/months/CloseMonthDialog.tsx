@@ -36,7 +36,7 @@ export function CloseMonthDialog({ month }: { month: Month }) {
   })
   const spent = { essential: 0, fun: 0 }
   for (const e of entries ?? []) {
-    spent[e.categories.bucket] += e.amount_cents
+    spent[e.bucket] += e.amount_cents
   }
   const expected = expectedInvestment(
     buckets,

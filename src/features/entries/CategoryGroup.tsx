@@ -47,7 +47,7 @@ export function CategoryGroup({
               key={e.id}
               className="flex items-center gap-2 py-1.5 text-sm"
             >
-              <span className="text-muted-foreground w-12 shrink-0 text-xs tabular-nums">
+              <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
                 {formatISODate(e.paid_on)}
               </span>
               <span className="flex-1 truncate">{e.note ?? '—'}</span>

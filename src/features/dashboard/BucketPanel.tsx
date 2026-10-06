@@ -33,9 +33,8 @@ export function BucketPanel({ month, bucket, title }: BucketPanelProps) {
   const budget =
     buckets[bucket] + (bucket === 'fun' ? extrasTotal(extras) : 0)
 
-  const bucketEntries = (entries ?? []).filter(
-    (e) => e.categories.bucket === bucket,
-  )
+  const bucketEntries = (entries ?? []).filter((e) => e.bucket === bucket)
+  const uncategorized = bucketEntries.filter((e) => e.category_id === null)
   const spent = bucketEntries.reduce((acc, e) => acc + e.amount_cents, 0)
   const bucketCategories = (categories ?? []).filter((c) => c.bucket === bucket)
   const activeCategories = bucketCategories.filter((c) => !c.archived)
@@ -52,7 +51,7 @@ export function BucketPanel({ month, bucket, title }: BucketPanelProps) {
         ) : undefined
       }
     >
-      {activeCategories.length === 0 ? (
+      {activeCategories.length === 0 && uncategorized.length === 0 ? (
         <EmptyState
           title="Nenhuma categoria"
           description="Crie categorias para organizar os gastos deste pote."
@@ -67,6 +66,20 @@ export function BucketPanel({ month, bucket, title }: BucketPanelProps) {
               editable={isOpen}
             />
           ))}
+          {uncategorized.length > 0 && (
+            <CategoryGroup
+              category={{
+                id: '',
+                user_id: '',
+                bucket,
+                name: 'Sem categoria',
+                archived: false,
+                created_at: '',
+              }}
+              entries={uncategorized}
+              editable={isOpen}
+            />
+          )}
         </div>
       )}
     </BucketCard>

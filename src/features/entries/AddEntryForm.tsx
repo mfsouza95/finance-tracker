@@ -19,9 +19,11 @@ interface AddEntryFormProps {
   onDone?: () => void
 }
 
-// Bank options use a `fund:` prefix in the select so they can share the
-// category dropdown — the DB keeps them in separate columns.
+// Bank options use a `fund:` prefix and category-less entries a `uncat:`
+// prefix so they can share the select — the DB keeps them in separate
+// columns.
 const FUND_PREFIX = 'fund:'
+const UNCAT_PREFIX = 'uncat:'
 
 export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
   const { session } = useSession()
@@ -30,7 +32,7 @@ export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
 
   const monthPrefix = `${month.year}-${String(month.month).padStart(2, '0')}`
   const schema = z.object({
-    categoryId: z.string().min(1, 'Escolha uma categoria'),
+    categoryId: z.string().min(1, 'Escolha um pote ou categoria'),
     amount: z
       .string()
       .refine(
@@ -67,18 +69,11 @@ export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
     },
   })
 
-  if (active.length === 0 && activeBanks.length === 0) {
-    return (
-      <p className="text-muted-foreground text-sm">
-        Crie uma categoria antes de lançar gastos.
-      </p>
-    )
-  }
-
   const submit = (data: FormData) => {
     const cents = parseBrlToCents(data.amount)
     if (cents === null || !session) return
     const isFund = data.categoryId.startsWith(FUND_PREFIX)
+    const isUncat = data.categoryId.startsWith(UNCAT_PREFIX)
     addEntry.mutate(
       {
         userId: session.user.id,
@@ -88,7 +83,13 @@ export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
         note: data.note.trim() || undefined,
         ...(isFund
           ? { fundId: data.categoryId.slice(FUND_PREFIX.length) }
-          : { categoryId: data.categoryId }),
+          : isUncat
+            ? {
+                bucket: data.categoryId.slice(UNCAT_PREFIX.length) as
+                  | 'essential'
+                  | 'fun',
+              }
+            : { categoryId: data.categoryId }),
       },
       {
         onSuccess: () => {
@@ -103,7 +104,7 @@ export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
     <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-3">
       <div className="flex flex-col gap-1.5">
         <label htmlFor="category" className="text-sm font-medium">
-          Categoria
+          Pote ou categoria
         </label>
         <select
           id="category"
@@ -112,6 +113,7 @@ export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
         >
           <option value="">Selecionar…</option>
           <optgroup label="Essencial">
+            <option value="uncat:essential">Sem categoria</option>
             {active
               .filter((c) => c.bucket === 'essential')
               .map((c) => (
@@ -121,6 +123,7 @@ export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
               ))}
           </optgroup>
           <optgroup label="Diversão">
+            <option value="uncat:fun">Sem categoria</option>
             {active
               .filter((c) => c.bucket === 'fun')
               .map((c) => (

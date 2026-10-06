@@ -27,7 +27,7 @@ export function MonthSummary({ month }: { month: Month }) {
   })
   const spent = { essential: 0, fun: 0 }
   for (const e of entries ?? []) {
-    spent[e.categories.bucket] += e.amount_cents
+    spent[e.bucket] += e.amount_cents
   }
   const totalSpent = spent.essential + spent.fun
   const extrasCents = extrasTotal(extras)

@@ -5,10 +5,14 @@ import { supabase } from '@/lib/supabase'
 
 export type Entry = Tables<'entries'>
 export type EntryWithCategory = Entry & {
-  categories: Pick<Tables<'categories'>, 'name' | 'bucket'>
+  bucket: NonNullable<Entry['bucket']>
+  categories: Pick<Tables<'categories'>, 'name' | 'bucket'> | null
   recurring_templates: Pick<Tables<'recurring_templates'>, 'installments_total'> | null
 }
 
+// Bucket entries only: the .not(bucket, is, null) filter drops fund 'out'
+// spends (they're shown via useFundEntries in the active-bank card) and
+// carries no category requirement — categories are organizational.
 export function useEntries(monthId: string | undefined) {
   return useQuery({
     enabled: monthId !== undefined,
@@ -16,8 +20,9 @@ export function useEntries(monthId: string | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('entries')
-        .select('*, categories!inner(name, bucket), recurring_templates(installments_total)')
+        .select('*, categories(name, bucket), recurring_templates(installments_total)')
         .eq('month_id', monthId!)
+        .not('bucket', 'is', null)
         .order('paid_on')
       if (error) throw error
       return data as EntryWithCategory[]
@@ -34,10 +39,12 @@ export function useAddEntry() {
       amountCents: number
       paidOn: string
       note?: string
-      // A normal entry has categoryId; a bank spend has fundId instead and
-      // bypasses the buckets (fund_flow='out', no category).
+      // A normal entry has a bucket and optional categoryId (or bucket is
+      // synced from the category server-side); a bank spend has fundId
+      // instead and bypasses the buckets (fund_flow='out').
       categoryId?: string
       fundId?: string
+      bucket?: 'essential' | 'fun'
     }) => {
       const { data, error } = await supabase
         .from('entries')
@@ -50,6 +57,7 @@ export function useAddEntry() {
           note: vars.note ?? null,
           fund_id: vars.fundId ?? null,
           fund_flow: vars.fundId ? 'out' : null,
+          bucket: vars.bucket ?? null,
         })
         .select()
         .single()

@@ -51,13 +51,13 @@ export type Database = {
                   ]
                 },"entries": {
                   Row: {
-                    "amount_cents": number,"category_id": string | null,"created_at": string,"fund_flow": string | null,"fund_id": string | null,"id": string,"installment_index": number | null,"month_id": string,"note": string | null,"paid_on": string,"recurring_template_id": string | null,"user_id": string
+                    "amount_cents": number,"bucket": Database["public"]['Enums']["bucket"] | null,"category_id": string | null,"created_at": string,"fund_flow": string | null,"fund_id": string | null,"id": string,"installment_index": number | null,"month_id": string,"note": string | null,"paid_on": string,"recurring_template_id": string | null,"user_id": string
                   }
                   Insert: {
-                    "amount_cents": number,"category_id"?: string | null,"created_at"?: string,"fund_flow"?: string | null,"fund_id"?: string | null,"id"?: string,"installment_index"?: number | null,"month_id": string,"note"?: string | null,"paid_on": string,"recurring_template_id"?: string | null,"user_id": string
+                    "amount_cents": number,"bucket"?: Database["public"]['Enums']["bucket"] | null,"category_id"?: string | null,"created_at"?: string,"fund_flow"?: string | null,"fund_id"?: string | null,"id"?: string,"installment_index"?: number | null,"month_id": string,"note"?: string | null,"paid_on": string,"recurring_template_id"?: string | null,"user_id": string
                   }
                   Update: {
-                    "amount_cents"?: number,"category_id"?: string | null,"created_at"?: string,"fund_flow"?: string | null,"fund_id"?: string | null,"id"?: string,"installment_index"?: number | null,"month_id"?: string,"note"?: string | null,"paid_on"?: string,"recurring_template_id"?: string | null,"user_id"?: string
+                    "amount_cents"?: number,"bucket"?: Database["public"]['Enums']["bucket"] | null,"category_id"?: string | null,"created_at"?: string,"fund_flow"?: string | null,"fund_id"?: string | null,"id"?: string,"installment_index"?: number | null,"month_id"?: string,"note"?: string | null,"paid_on"?: string,"recurring_template_id"?: string | null,"user_id"?: string
                   }
                   Relationships: [
                     {
