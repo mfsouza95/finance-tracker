@@ -16,7 +16,20 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
         run: |
-          curl -sf -o /dev/null -w "%{http_code}\n" \
+          if [ -z "$SUPABASE_URL" ]; then
+            echo "::error::SUPABASE_URL secret is missing or empty"
+            exit 1
+          fi
+          if [ -z "$SUPABASE_PUBLISHABLE_KEY" ]; then
+            echo "::error::SUPABASE_PUBLISHABLE_KEY secret is missing or empty"
+            exit 1
+          fi
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
             -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" \
-            "$SUPABASE_URL/rest/v1/"
+            "${SUPABASE_URL%/}/rest/v1/")
+          echo "HTTP $code"
+          case "$code" in
+            2*) ;;
+            *) echo "::error::Ping failed with HTTP $code"; exit 1 ;;
+          esac
