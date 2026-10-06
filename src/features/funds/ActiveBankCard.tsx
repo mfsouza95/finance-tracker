@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Trash2 } from 'lucide-react'
 
 import { EmptyState } from '@/components/EmptyState'
 import { Money } from '@/components/Money'
 import { Button } from '@/components/ui/button'
 import { monthLabel } from '@/lib/dates'
+import { useDeleteEntry } from '@/features/entries/hooks'
 import type { Month } from '@/features/months/hooks'
 
 import {
@@ -20,7 +21,9 @@ export function ActiveBankCard({ month }: { month: Month }) {
   const { data: banks } = useFunds('bank')
   const { data: balances } = useFundBalances()
   const { data: fundEntries } = useFundEntries(month.id)
+  const deleteEntry = useDeleteEntry()
   const [index, setIndex] = useState(0)
+  const isOpen = month.status === 'open'
 
   const active = (banks ?? []).filter((b) => b.active)
   const bank = active[index % Math.max(active.length, 1)]
@@ -104,6 +107,20 @@ export function ActiveBankCard({ month }: { month: Month }) {
                     {e.note ?? bank.name}
                   </span>
                   <Money cents={e.amount_cents} size="sm" tone="negative" />
+                  {isOpen && (
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label="Excluir entrada"
+                      onClick={() => {
+                        if (confirm('Excluir esta entrada?')) {
+                          deleteEntry.mutate(e.id)
+                        }
+                      }}
+                    >
+                      <Trash2 className="size-3.5" />
+                    </Button>
+                  )}
                 </li>
               ))}
               {spends.length > 4 && (
