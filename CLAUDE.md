@@ -112,7 +112,26 @@ docs/
 4. **Month close:** `close_month`, summaries, history, read-only closed months.
 5. **Polish:** PWA install, what-if simulator, charts, realtime sync, Playwright e2e, CSV import (optional).
 6. **Sharing:** invite friends and family after 1 to 2 months of solo use; onboarding and delete-account path.
-7. **Optional:** offline write queue, Tauri desktop wrapper, budget alerts, other strategy shapes.
+7. **Optional:** offline write queue, Tauri desktop wrapper, budget alerts, other strategy shapes. See also Future feature ideas below.
+
+## Future feature ideas (not committed — do not build yet)
+
+Parked ideas to be designed together before any implementation. Both touch the money model, so they need design review first (per Conventions).
+
+### Daily / weekly allowance ("pace" counter)
+
+- Shows how much can still be spent per day and per week, derived from what is left of the month's budget.
+- The daily amount is a fixed number set at midnight; the weekly amount is fixed each Monday. Neither moves during the day as entries are logged — the number only changes on the next reset.
+- Busting the limit shows the counter negative in red (`--negative` token), so the overspend amount stays visible.
+- Week boundaries clip at month end: the last day of the month counts as the last day of that week, and the allowance resets on the 1st of the next month even when it is not a Monday.
+- **Manual recalculation:** a "recalculate" button recomputes the daily/weekly figure now (e.g. after a big planned expense or piggy-bank deposit that would otherwise bust the allowance) instead of waiting for the next reset. It refreshes the allowance amount but does NOT reset the counter — what was already spent today/this week is still subtracted, so the display shows `new_allowance - spent_in_period`, which can be negative right away.
+- To settle before building: which budget it derives from (fun bucket? month total to spend?); how the fixed figure is computed (e.g. remaining ÷ remaining days in the period); whether it needs a stored per-day/per-week snapshot or derives client-side; whose timezone defines "midnight"/"Monday" for a multi-user app; whether a manual recalculation also refreshes the weekly figure, only the daily one, or both separately.
+
+### Bank and piggy bank
+
+- **Bank:** a named reserve fed by setting aside part of the monthly budget. It can later be activated for an occasion (e.g. a trip): entries tagged to that occasion draw from the bank balance first; once the bank hits zero, further entries count against the month's bucket budget again.
+- **Piggy bank:** goal tracking for a planned purchase — set aside a labelled amount and track progress toward the goal.
+- To settle before building: whether feeding a bank/piggy bank counts as spending at feed time or at spend time; whether entries get an optional fund link (schema change affecting rest math, `close_month` and summaries); how bank balances interact with expected investment; whether piggy-bank savings live inside the invest bucket or outside the split entirely.
 
 ## Scope discipline
 
@@ -133,11 +152,14 @@ App name; UI language default; how to track invested amounts (decision so far: a
 
 ## Database contract (do not undo)
 
-- Clients create and close months only through the RPCs `open_month(year, month, net)` and `close_month(month_id, invested)`. Never insert a closed month or set `status = 'closed'` directly.
+- Clients create, close and reopen months only through the RPCs `open_month(year, month, net)`, `close_month(month_id, invested)` and `reopen_month(month_id)`. Never insert a closed month or change `status` directly.
 - `open_month` generates recurring entries only when it creates the month. Calling it for an existing open month returns it unchanged and ignores the net amount. Change net income with a normal update on `months`. Deleted generated entries are never brought back. Templates on archived categories are skipped.
-- `close_month` is SECURITY DEFINER and is the only writer of `month_summaries`, which is read-only for clients.
-- Closed months and their entries are read-only. A direct client delete of a closed month or entry is rejected. Deleting a recurring template nulls the link on its entries, even in closed months. Deleting an open month cascades its entries.
+- Templates are created via `create_recurring_template`, which also backfills entries into already-open months: bounded plans into every open month inside their window, unbounded templates only into open months from the creation month onward (a reopened past month never gains a retroactive entry). Closed months are never written to.
+- **Extra income** (`extra_income` table) is unplanned money received mid-month — it bypasses the split and lands 100% in the fun bucket. Each receipt is its own row (amount, received_on, note), read-only when the month closes, cascades on open-month delete. `close_month` adds the extras total to `fun_budget_cents` and records `month_summaries.extra_income_cents`, so unspent extras still flow into expected investment via fun rest.
+- **Installments (parcelas)** are bounded templates: `installments_total` + `first_year`/`first_month` set, or all three null for indefinite recurrence. The installment index is position-based (`months elapsed since first + 1`), not a counter — skipped or backfilled months never shift numbering, and a closed month inside the window is skipped (its installment is never written unless the month is reopened and the entry added manually). Generated entries carry `entries.installment_index` (null for unbounded). Cancel/early payoff = `active = false`; reactivating resumes at the correct position.
+- `close_month` is SECURITY DEFINER and is the only writer of `month_summaries`, which is read-only for clients. `reopen_month` (also SECURITY DEFINER) is the only way back: it deletes the summary row and sets the month open, clearing `closed_at`/`invested_cents`. Re-closing recomputes the summary from current data.
+- Closed months and their entries are read-only until reopened via `reopen_month`. A direct client delete of a closed month or entry is rejected. Deleting a recurring template nulls the link on its entries, even in closed months. Deleting an open month cascades its entries.
 - `categories.bucket` cannot change once the category has entries. Categories and templates with history are archived or deactivated, not deleted.
 - `profiles` and `budget_settings` are created at signup and are select and update only for clients.
-- Execute on `open_month` and `close_month` is granted to `authenticated` only.
+- Execute on `open_month`, `close_month`, `reopen_month` and `create_recurring_template` is granted to `authenticated` only.
 - Migrations and pgTAP tests in `supabase/` are the source of truth. Any schema change ships with tests. Run `supabase db reset` and `supabase test db` before every commit.
