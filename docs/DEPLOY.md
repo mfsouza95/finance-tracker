@@ -82,7 +82,7 @@ Repo → Settings → Secrets and variables → Actions:
 | --- | --- |
 | `SUPABASE_URL` | `https://<ref>.supabase.co` |
 | `SUPABASE_PUBLISHABLE_KEY` | publishable key |
-| `SUPABASE_DB_URL` | `postgresql://postgres.<ref>:<db-password>@aws-0-<region>.pooler.supabase.com:6543/postgres` (Settings → Database → connection string, session/transaction pooler) |
+| `SUPABASE_DB_URL` | Dashboard **Connect** button → "Session pooler" URI: `postgresql://postgres.<ref>:<db-password>@aws-0-<region>.pooler.supabase.com:5432/postgres` — use the pooler (GitHub runners have no IPv6 for a direct connection) and session mode specifically (port 5432, not the transaction pooler on 6543). |
 
 - **Keepalive** pings the REST endpoint every 3 days so the free project does
   not pause. Without it, the project pauses after ~7 idle days and auth/API
