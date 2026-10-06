@@ -7,21 +7,28 @@ scheduled jobs (already in `.github/workflows/`).
 ## 1. Supabase cloud project
 
 1. Create a project at https://supabase.com/dashboard (any name; pick the
-   closest region, e.g. `sa-east-1`).
-2. From the project settings → **Data API** and **API keys**, copy:
-   - Project URL: `https://<ref>.supabase.co`
-   - Publishable key (`sb_publishable_...`)
-   - The database password you set at creation (needed for the backup secret).
-3. Link and push the schema:
+   closest region, e.g. `sa-east-1`). Save the **database password** it asks
+   you to set — you need it in the next step and for the backup secret.
+
+2. Find your **project ref**: it is the subdomain of your project URL —
+   `https://abcdefgh.supabase.co` → ref is `abcdefgh`. It is also in
+   Project Settings → General.
+
+3. From the repo root, link and push the schema:
 
    ```bash
-   pnpm supabase link --project-ref <ref>
-   pnpm supabase db push
+   pnpm supabase link --project-ref abcdefgh   # asks for the DB password from step 1
+   pnpm supabase db push                        # lists migrations, asks to confirm
    ```
 
-   `db push` applies every migration in `supabase/migrations/`. The pgTAP
-   files under `supabase/tests/` never run against prod. `seed.sql` does not
-   run on `db push` (it only applies to local `db reset`).
+   `db push` applies every migration in `supabase/migrations/` — all tables,
+   RLS policies, triggers and RPCs ship together, nothing manual. The pgTAP
+   files under `supabase/tests/` never run against prod, and `seed.sql` only
+   applies to local `db reset`.
+
+   > The **Project URL** and **publishable key** you copied are NOT used by
+   > the CLI — they go into the hosting env vars in step 2 below.
+   > `supabase link` authenticates with your Supabase login, not the API key.
 
 4. Auth URL config — in the dashboard: **Authentication → URL Configuration**:
    - Site URL: your prod domain (e.g. `https://finance.example.com`)
