@@ -27,15 +27,11 @@ export function Dashboard() {
   }
 
   return (
-    <>
-      <div className="grid grid-cols-3 items-start gap-6">
-        <MonthSummary month={month} />
-        <BucketPanel month={month} bucket="essential" title="Essencial" />
-        <BucketPanel month={month} bucket="fun" title="Diversão" />
-      </div>
-      <div className="mt-6">
-        <RecurringPanel />
-      </div>
-    </>
+    <div className="grid grid-cols-3 items-start gap-6">
+      <MonthSummary month={month} />
+      <BucketPanel month={month} bucket="essential" title="Essencial" />
+      <BucketPanel month={month} bucket="fun" title="Diversão" />
+      <RecurringPanel />
+    </div>
   )
 }

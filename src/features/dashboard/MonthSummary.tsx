@@ -7,6 +7,7 @@ import {
   monthTotalToSpend,
 } from '@/lib/money'
 import { useEntries } from '@/features/entries/hooks'
+import { ExtrasDialog } from '@/features/extras/ExtrasDialog'
 import { extrasTotal, useExtras } from '@/features/extras/hooks'
 import { CloseMonthDialog } from '@/features/months/CloseMonthDialog'
 import { MonthSettingsDialog } from '@/features/months/MonthSettingsDialog'
@@ -101,25 +102,29 @@ export function MonthSummary({ month }: { month: Month }) {
         {isOpen ? (
           <>
             <MonthSettingsDialog month={month} />
+            <ExtrasDialog month={month} />
             <CloseMonthDialog month={month} />
           </>
         ) : (
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={reopenMonth.isPending}
-            onClick={() => {
-              if (
-                confirm(
-                  'Reabrir o mês? O resumo salvo será descartado e recalculado no próximo fechamento.',
-                )
-              ) {
-                reopenMonth.mutate(month.id)
-              }
-            }}
-          >
-            {reopenMonth.isPending ? 'Reabrindo…' : 'Reabrir mês'}
-          </Button>
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={reopenMonth.isPending}
+              onClick={() => {
+                if (
+                  confirm(
+                    'Reabrir o mês? O resumo salvo será descartado e recalculado no próximo fechamento.',
+                  )
+                ) {
+                  reopenMonth.mutate(month.id)
+                }
+              }}
+            >
+              {reopenMonth.isPending ? 'Reabrindo…' : 'Reabrir mês'}
+            </Button>
+            <ExtrasDialog month={month} />
+          </>
         )}
       </div>
     </section>

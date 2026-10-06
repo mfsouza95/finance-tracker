@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Archive, ArchiveRestore } from 'lucide-react'
+import { Archive, ArchiveRestore, Tags } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -52,9 +52,12 @@ export function CategoryManager({ bucket, categories }: CategoryManagerProps) {
   }
 
   return (
-    <Collapsible className="mt-4">
-      <CollapsibleTrigger className="text-muted-foreground text-xs underline-offset-2 hover:underline">
-        Gerenciar categorias
+    <Collapsible className="mt-4 self-start">
+      <CollapsibleTrigger asChild>
+        <Button variant="outline" size="sm">
+          <Tags className="size-4" />
+          Gerenciar categorias
+        </Button>
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-2 flex flex-col gap-2">
         <ul className="flex flex-col gap-1">

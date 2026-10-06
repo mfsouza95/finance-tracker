@@ -9,7 +9,6 @@ import {
   CategoryGroup,
 } from '@/features/entries/CategoryGroup'
 import { useEntries } from '@/features/entries/hooks'
-import { ExtrasPanel } from '@/features/extras/ExtrasPanel'
 import { extrasTotal, useExtras } from '@/features/extras/hooks'
 import type { Month } from '@/features/months/hooks'
 
@@ -71,8 +70,6 @@ export function BucketPanel({ month, bucket, title }: BucketPanelProps) {
       {isOpen && (
         <CategoryManager bucket={bucket} categories={bucketCategories} />
       )}
-
-      {bucket === 'fun' && <ExtrasPanel month={month} />}
     </section>
   )
 }
