@@ -103,77 +103,126 @@ export function SignInPage() {
     if (error) setError(friendlyError(error.message))
   }
 
+  const fieldError = errors.email?.message ?? errors.password?.message
+
   return (
-    <main>
-      <h1>{mode === 'signin' ? 'Entrar' : 'Criar conta'}</h1>
-      {notice && <p role="status">{notice}</p>}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <label htmlFor="email">E-mail</label>
-        <Input
-          id="email"
-          type="email"
-          autoComplete="email"
-          {...register('email')}
-        />
-        {errors.email && <p role="alert">{errors.email.message}</p>}
+    <main className="flex min-h-svh items-center justify-center bg-background px-4">
+      <div className="w-full max-w-sm rounded-2xl border bg-card p-8 shadow-sm">
+        <div className="mb-6 space-y-1 text-center">
+          <p className="text-xs font-medium uppercase tracking-widest text-primary">
+            finance tracker
+          </p>
+          <h1 className="text-xl font-semibold tracking-tight">
+            {mode === 'signin' ? 'Entrar' : 'Criar conta'}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {mode === 'signin'
+              ? 'Acesse seu orçamento mensal'
+              : 'Crie sua conta para começar'}
+          </p>
+        </div>
 
-        <label htmlFor="password">Senha</label>
-        <Input
-          id="password"
-          type="password"
-          autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-          {...register('password')}
-        />
-        {errors.password && <p role="alert">{errors.password.message}</p>}
-
-        {mode === 'signup' && (
-          <>
-            <label htmlFor="confirmPassword">Confirmar senha</label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              {...register('confirmPassword')}
-            />
-          </>
+        {notice && (
+          <p role="status" className="mb-4 rounded-lg bg-muted p-3 text-sm">
+            {notice}
+          </p>
         )}
 
-        {error && <p role="alert">{error}</p>}
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? 'Enviando…'
-            : mode === 'signin'
-              ? 'Entrar'
-              : 'Criar conta'}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => void onMagicLink()}
-          disabled={isSubmitting}
-        >
-          Entrar com link por e-mail
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => void onGoogle()}
-          disabled={isSubmitting}
-        >
-          Entrar com Google
-        </Button>
-        <p>
-          {mode === 'signin' ? (
-            <button type="button" onClick={() => switchMode('signup')}>
-              Não tem conta? Criar conta
-            </button>
-          ) : (
-            <button type="button" onClick={() => switchMode('signin')}>
-              Já tem conta? Entrar
-            </button>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-1.5">
+            <label htmlFor="email" className="text-sm font-medium">
+              E-mail
+            </label>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              {...register('email')}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="password" className="text-sm font-medium">
+              Senha
+            </label>
+            <Input
+              id="password"
+              type="password"
+              autoComplete={
+                mode === 'signin' ? 'current-password' : 'new-password'
+              }
+              {...register('password')}
+            />
+          </div>
+
+          {mode === 'signup' && (
+            <div className="space-y-1.5">
+              <label htmlFor="confirmPassword" className="text-sm font-medium">
+                Confirmar senha
+              </label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                {...register('confirmPassword')}
+              />
+            </div>
           )}
+
+          {(fieldError || error) && (
+            <p role="alert" className="text-sm text-destructive">
+              {fieldError ?? error}
+            </p>
+          )}
+
+          <Button type="submit" disabled={isSubmitting} className="w-full">
+            {isSubmitting
+              ? 'Enviando…'
+              : mode === 'signin'
+                ? 'Entrar'
+                : 'Criar conta'}
+          </Button>
+        </form>
+
+        <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
+          <span className="h-px flex-1 bg-border" />
+          ou
+          <span className="h-px flex-1 bg-border" />
+        </div>
+
+        <div className="space-y-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => void onMagicLink()}
+            disabled={isSubmitting}
+          >
+            Entrar com link por e-mail
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => void onGoogle()}
+            disabled={isSubmitting}
+          >
+            Entrar com Google
+          </Button>
+        </div>
+
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          {mode === 'signin' ? 'Não tem conta?' : 'Já tem conta?'}{' '}
+          <Button
+            type="button"
+            variant="link"
+            className="h-auto p-0 align-baseline"
+            onClick={() => switchMode(mode === 'signin' ? 'signup' : 'signin')}
+          >
+            {mode === 'signin' ? 'Criar conta' : 'Entrar'}
+          </Button>
         </p>
-      </form>
+      </div>
     </main>
   )
 }
