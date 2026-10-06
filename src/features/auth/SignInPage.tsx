@@ -92,6 +92,27 @@ export function SignInPage() {
     }
   }
 
+  const onForgotPassword = async () => {
+    setError(null)
+    setNotice(null)
+    const email = getValues('email')
+    const parsed = z.email().safeParse(email)
+    if (!parsed.success) {
+      setError('Informe seu e-mail para redefinir a senha')
+      return
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin,
+    })
+    if (error) {
+      setError(friendlyError(error.message))
+    } else {
+      setNotice(
+        `Se houver uma conta para ${email}, enviamos um link para redefinir a senha.`,
+      )
+    }
+  }
+
   const onGoogle = async () => {
     setError(null)
     setNotice(null)
@@ -142,9 +163,21 @@ export function SignInPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="password" className="text-sm font-medium">
-              Senha
-            </label>
+            <div className="flex items-baseline justify-between">
+              <label htmlFor="password" className="text-sm font-medium">
+                Senha
+              </label>
+              {mode === 'signin' && (
+                <button
+                  type="button"
+                  className="text-xs text-muted-foreground hover:text-foreground hover:underline"
+                  onClick={() => void onForgotPassword()}
+                  disabled={isSubmitting}
+                >
+                  Esqueci a senha
+                </button>
+              )}
+            </div>
             <Input
               id="password"
               type="password"

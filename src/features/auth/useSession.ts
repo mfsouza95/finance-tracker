@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 export function useSession() {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [recovery, setRecovery] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -18,7 +19,11 @@ export function useSession() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, next) => {
       setSession(next)
+      if (event === 'PASSWORD_RECOVERY') {
+        setRecovery(true)
+      }
       if (event === 'SIGNED_OUT') {
+        setRecovery(false)
         clearQueryCache()
       }
     })
@@ -26,7 +31,7 @@ export function useSession() {
     return () => subscription.unsubscribe()
   }, [])
 
-  return { session, loading }
+  return { session, loading, recovery, clearRecovery: () => setRecovery(false) }
 }
 
 export async function signOut() {
