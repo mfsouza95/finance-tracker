@@ -82,7 +82,9 @@ VITE_SUPABASE_URL=https://<ref>.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
 
-No SPA rewrite rules are needed — there is no client-side router.
+SPA rewrites ship in `vercel.json` (deep links like `/historico` need to
+fall back to `index.html`). For Cloudflare Pages use a `_redirects` file
+with `/*  /index.html  200` instead.
 
 ## 3. GitHub secrets (for the scheduled workflows)
 

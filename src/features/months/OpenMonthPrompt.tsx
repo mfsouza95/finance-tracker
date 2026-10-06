@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,20 +7,14 @@ import { parseBrlToCents } from '@/lib/money'
 import { signOut } from '@/features/auth/useSession'
 
 import { useOpenMonth } from './hooks'
-
-interface OpenMonthPromptProps {
-  year: number
-  month: number
-  onNavigate: (year: number, month: number) => void
-}
+import { useSelectedMonth } from './selectedMonth'
 
 // Shown for any year/month without a month row — the month only exists after
-// open_month, which needs the net income to snapshot the buckets.
-export function OpenMonthPrompt({
-  year,
-  month,
-  onNavigate,
-}: OpenMonthPromptProps) {
+// open_month, which needs the net income to snapshot the buckets. Month
+// navigation lives in the header's MonthNav.
+export function OpenMonthPrompt() {
+  const { ym, navigate } = useSelectedMonth()
+  const { year, month } = ym
   const [net, setNet] = useState('')
   const [error, setError] = useState<string | null>(null)
   const openMonth = useOpenMonth()
@@ -29,11 +22,6 @@ export function OpenMonthPrompt({
   const isCurrent = year === current.year && month === current.month
   const isFuture =
     year > current.year || (year === current.year && month > current.month)
-
-  const prev =
-    month === 1 ? { year: year - 1, month: 12 } : { year, month: month - 1 }
-  const next =
-    month === 12 ? { year: year + 1, month: 1 } : { year, month: month + 1 }
 
   const submit = () => {
     const cents = parseBrlToCents(net)
@@ -49,28 +37,10 @@ export function OpenMonthPrompt({
   }
 
   return (
-    <main className="mx-auto flex max-w-sm flex-col gap-4 p-6">
-      <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label="Mês anterior"
-          onClick={() => onNavigate(prev.year, prev.month)}
-        >
-          <ChevronLeft className="size-4" />
-        </Button>
-        <h2 className="text-lg font-semibold capitalize">
-          Abrir {monthLabel(year, month)}
-        </h2>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label="Próximo mês"
-          onClick={() => onNavigate(next.year, next.month)}
-        >
-          <ChevronRight className="size-4" />
-        </Button>
-      </div>
+    <div className="mx-auto flex max-w-sm flex-col gap-4">
+      <h2 className="text-lg font-semibold capitalize">
+        {isFuture ? monthLabel(year, month) : `Abrir ${monthLabel(year, month)}`}
+      </h2>
 
       {isFuture ? (
         <p className="text-muted-foreground text-sm">
@@ -122,11 +92,11 @@ export function OpenMonthPrompt({
         <Button
           variant="link"
           className="self-start px-0"
-          onClick={() => onNavigate(current.year, current.month)}
+          onClick={() => navigate(current.year, current.month)}
         >
           Voltar para o mês atual
         </Button>
       )}
-    </main>
+    </div>
   )
 }

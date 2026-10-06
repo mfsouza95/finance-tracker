@@ -1,9 +1,6 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Money } from '@/components/Money'
-import { monthLabel } from '@/lib/dates'
 import {
   computeBuckets,
   expectedInvestment,
@@ -16,26 +13,11 @@ import { MonthSettingsDialog } from '@/features/months/MonthSettingsDialog'
 import { useReopenMonth } from '@/features/months/hooks'
 import type { Month } from '@/features/months/hooks'
 
-export function MonthSummary({
-  month,
-  onNavigate,
-}: {
-  month: Month
-  onNavigate: (year: number, month: number) => void
-}) {
+export function MonthSummary({ month }: { month: Month }) {
   const { data: entries } = useEntries(month.id)
   const { data: extras } = useExtras(month.id)
   const reopenMonth = useReopenMonth()
   const isOpen = month.status === 'open'
-
-  const prev =
-    month.month === 1
-      ? { year: month.year - 1, month: 12 }
-      : { year: month.year, month: month.month - 1 }
-  const next =
-    month.month === 12
-      ? { year: month.year + 1, month: 1 }
-      : { year: month.year, month: month.month + 1 }
 
   const buckets = computeBuckets(month.net_income_cents, {
     essentialPct: month.essential_pct,
@@ -62,27 +44,9 @@ export function MonthSummary({
       className="rounded-lg border border-border bg-card p-4"
     >
       <header className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Mês anterior"
-            onClick={() => onNavigate(prev.year, prev.month)}
-          >
-            <ChevronLeft className="size-4" />
-          </Button>
-          <h2 className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
-            {monthLabel(month.year, month.month)}
-          </h2>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Próximo mês"
-            onClick={() => onNavigate(next.year, next.month)}
-          >
-            <ChevronRight className="size-4" />
-          </Button>
-        </div>
+        <h2 className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
+          Resumo
+        </h2>
         <Badge variant={isOpen ? 'secondary' : 'outline'}>
           {isOpen ? 'Aberto' : 'Fechado'}
         </Badge>
