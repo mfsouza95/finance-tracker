@@ -165,13 +165,13 @@ isOneToOne: false
                   ]
                 },"recurring_templates": {
                   Row: {
-                    "active": boolean,"amount_cents": number,"category_id": string,"created_at": string,"day_of_month": number,"first_month": number | null,"first_year": number | null,"id": string,"installments_total": number | null,"label": string,"user_id": string
+                    "active": boolean,"amount_cents": number,"bucket": Database["public"]['Enums']["bucket"] | null,"category_id": string | null,"created_at": string,"day_of_month": number,"first_month": number | null,"first_year": number | null,"id": string,"installments_total": number | null,"label": string,"user_id": string
                   }
                   Insert: {
-                    "active"?: boolean,"amount_cents": number,"category_id": string,"created_at"?: string,"day_of_month": number,"first_month"?: number | null,"first_year"?: number | null,"id"?: string,"installments_total"?: number | null,"label": string,"user_id": string
+                    "active"?: boolean,"amount_cents": number,"bucket"?: Database["public"]['Enums']["bucket"] | null,"category_id"?: string | null,"created_at"?: string,"day_of_month": number,"first_month"?: number | null,"first_year"?: number | null,"id"?: string,"installments_total"?: number | null,"label": string,"user_id": string
                   }
                   Update: {
-                    "active"?: boolean,"amount_cents"?: number,"category_id"?: string,"created_at"?: string,"day_of_month"?: number,"first_month"?: number | null,"first_year"?: number | null,"id"?: string,"installments_total"?: number | null,"label"?: string,"user_id"?: string
+                    "active"?: boolean,"amount_cents"?: number,"bucket"?: Database["public"]['Enums']["bucket"] | null,"category_id"?: string | null,"created_at"?: string,"day_of_month"?: number,"first_month"?: number | null,"first_year"?: number | null,"id"?: string,"installments_total"?: number | null,"label"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -218,10 +218,11 @@ isOneToOne: false
         isSetofReturn: false
       } },
 "create_recurring_template":
-{ Args: { "p_amount_cents": number,"p_category_id": string,"p_day_of_month": number,"p_first_month"?: number,"p_first_year"?: number,"p_installments_total"?: number,"p_label": string }; Returns: {
+{ Args: { "p_amount_cents": number,"p_bucket"?: Database["public"]['Enums']["bucket"],"p_category_id"?: string,"p_day_of_month": number,"p_first_month"?: number,"p_first_year"?: number,"p_installments_total"?: number,"p_label": string }; Returns: {
               "active": boolean,
 "amount_cents": number,
-"category_id": string,
+"bucket": Database["public"]['Enums']["bucket"] | null,
+"category_id": string | null,
 "created_at": string,
 "day_of_month": number,
 "first_month": number | null,

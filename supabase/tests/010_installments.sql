@@ -55,7 +55,8 @@ select public.close_month(
 -- Backfills the two open months; the closed C+2 is skipped.
 -- ----------------------------------------------------------------
 select public.create_recurring_template(
-  'cb100000-0000-0000-0000-000000000001'::uuid, 'Plano A', 3000::bigint, 10::smallint,
+  'Plano A', 3000::bigint, 10::smallint,
+  'cb100000-0000-0000-0000-000000000001'::uuid, null,
   3::smallint, null, null);
 
 select is(
@@ -89,7 +90,8 @@ select is(
 -- the skipped closed month does not shift positions.
 -- ----------------------------------------------------------------
 select public.create_recurring_template(
-  'cb100000-0000-0000-0000-000000000001'::uuid, 'Plano B', 2000::bigint, 5::smallint,
+  'Plano B', 2000::bigint, 5::smallint,
+  'cb100000-0000-0000-0000-000000000001'::uuid, null,
   4::smallint,
   extract(year from current_date)::smallint,
   extract(month from current_date)::smallint);
@@ -127,7 +129,8 @@ select is(
 -- C, C+1 and C+3 are open (C+2 is closed) -> exactly 3 entries.
 -- ----------------------------------------------------------------
 select public.create_recurring_template(
-  'cb100000-0000-0000-0000-000000000001'::uuid, 'Netflix', 5000::bigint, 15::smallint);
+  'Netflix', 5000::bigint, 15::smallint,
+  'cb100000-0000-0000-0000-000000000001'::uuid);
 
 select is(
   (select count(*)::int from public.entries e
@@ -167,13 +170,15 @@ select is(
 -- ----------------------------------------------------------------
 select throws_ok(
   $$ select public.create_recurring_template(
-    'cb100000-0000-0000-0000-000000000001'::uuid, 'Ruim', 1000::bigint, 10::smallint, 1::smallint, null, null) $$,
+    'Ruim', 1000::bigint, 10::smallint,
+    'cb100000-0000-0000-0000-000000000001'::uuid, null, 1::smallint, null, null) $$,
   'P0001', 'installments_total must be >= 2',
   'single-payment plans are rejected');
 
 select throws_ok(
   $$ select public.create_recurring_template(
-    'cb100000-0000-0000-0000-000000000002'::uuid, 'Arquivada', 1000::bigint, 10::smallint) $$,
+    'Arquivada', 1000::bigint, 10::smallint,
+    'cb100000-0000-0000-0000-000000000002'::uuid) $$,
   'P0001', 'category not found or archived',
   'archived category is rejected');
 
@@ -181,7 +186,7 @@ reset role;
 set role anon;
 select throws_ok(
   $$ select public.create_recurring_template(
-    gen_random_uuid(), 'x', 1000::bigint, 10::smallint) $$,
+    'x', 1000::bigint, 10::smallint, gen_random_uuid()) $$,
   '42501', null,
   'anon cannot execute create_recurring_template');
 

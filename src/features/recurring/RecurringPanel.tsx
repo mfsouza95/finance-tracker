@@ -26,6 +26,9 @@ import {
   type TemplateWithCategory,
 } from './hooks'
 
+// Category-less templates use the same `uncat:` scheme as AddEntryForm.
+const UNCAT_PREFIX = 'uncat:'
+
 // Recurring templates + installment plans. A bounded template (parcelas)
 // generates one entry per opened month and stops after installments_total;
 // an unbounded one recurs forever. Progress is position-based, so skipped
@@ -117,7 +120,7 @@ function TemplateRow({
       </div>
       <div className="mt-1 flex items-center justify-between gap-2">
         <span className="text-muted-foreground text-xs">
-          {t.categories.name} · dia {t.day_of_month}
+          {t.categories?.name ?? 'Sem categoria'} · dia {t.day_of_month}
           {progress !== null &&
             ` · desde ${monthLabel(t.first_year!, t.first_month!)}`}
         </span>
@@ -174,7 +177,7 @@ function CreateTemplateForm({
       return
     }
     if (!categoryId) {
-      setError('Escolha uma categoria')
+      setError('Escolha um pote ou categoria')
       return
     }
     if (!Number.isInteger(dayN) || dayN < 1 || dayN > 31) {
@@ -199,7 +202,13 @@ function CreateTemplateForm({
     setError(null)
     createTemplate.mutate(
       {
-        categoryId,
+        ...(categoryId.startsWith(UNCAT_PREFIX)
+          ? {
+              bucket: categoryId.slice(UNCAT_PREFIX.length) as
+                | 'essential'
+                | 'fun',
+            }
+          : { categoryId }),
         label: label.trim(),
         amountCents: cents,
         dayOfMonth: dayN,
@@ -259,7 +268,7 @@ function CreateTemplateForm({
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="tpl-category" className="text-sm font-medium">
-          Categoria
+          Pote ou categoria
         </label>
         <select
           id="tpl-category"
@@ -268,6 +277,10 @@ function CreateTemplateForm({
           onChange={(e) => setCategoryId(e.target.value)}
         >
           <option value="">Selecionar…</option>
+          <option value={`${UNCAT_PREFIX}essential`}>
+            Sem categoria (Essencial)
+          </option>
+          <option value={`${UNCAT_PREFIX}fun`}>Sem categoria (Diversão)</option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name} ({c.bucket === 'essential' ? 'Essencial' : 'Diversão'})

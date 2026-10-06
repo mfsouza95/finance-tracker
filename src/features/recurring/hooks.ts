@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 
 export type RecurringTemplate = Tables<'recurring_templates'>
 export type TemplateWithCategory = RecurringTemplate & {
-  categories: Pick<Tables<'categories'>, 'name' | 'bucket'>
+  categories: Pick<Tables<'categories'>, 'name' | 'bucket'> | null
 }
 
 // Installment progress for a bounded template at a given calendar month:
@@ -29,7 +29,7 @@ export function useRecurringTemplates() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('recurring_templates')
-        .select('*, categories!inner(name, bucket)')
+        .select('*, categories(name, bucket)')
         .order('active', { ascending: false })
         .order('label')
       if (error) throw error
@@ -42,7 +42,10 @@ export function useCreateTemplate() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (vars: {
-      categoryId: string
+      // Either a category (organization) or a bare bucket is required —
+      // same rule as entries.
+      categoryId?: string
+      bucket?: 'essential' | 'fun'
       label: string
       amountCents: number
       dayOfMonth: number
@@ -52,6 +55,7 @@ export function useCreateTemplate() {
     }) => {
       const { data, error } = await supabase.rpc('create_recurring_template', {
         p_category_id: vars.categoryId,
+        p_bucket: vars.bucket,
         p_label: vars.label,
         p_amount_cents: vars.amountCents,
         p_day_of_month: vars.dayOfMonth,
