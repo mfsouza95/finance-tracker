@@ -58,7 +58,7 @@ export function BanksPanel({ month }: { month: Month }) {
             <BankRow
               key={b.id}
               fund={b}
-              balance={balances?.get(b.id) ?? 0}
+              balance={balances?.[b.id] ?? 0}
               month={month}
             />
           ))}

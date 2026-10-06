@@ -19,7 +19,9 @@ export function useFunds(kind?: FundKind) {
   })
 }
 
-/** fund_id -> balance (deposits - spends). Missing fund = 0. */
+/** fund_id -> balance (deposits - spends). Missing fund = 0. Must stay a
+ * plain Record: the persisted query cache serializes data to JSON, and a
+ * Map would rehydrate as {} and break .get() calls. */
 export function useFundBalances() {
   return useQuery({
     queryKey: ['fund_balances'],
@@ -28,13 +30,11 @@ export function useFundBalances() {
         .from('fund_balances')
         .select('fund_id, balance_cents')
       if (error) throw error
-      return new Map(
+      return Object.fromEntries(
         data
-          .filter((r): r is { fund_id: string; balance_cents: number } =>
-            r.fund_id !== null && r.balance_cents !== null,
-          )
-          .map((r) => [r.fund_id, r.balance_cents]),
-      )
+          .filter((r) => r.fund_id !== null && r.balance_cents !== null)
+          .map((r) => [r.fund_id!, r.balance_cents!]),
+      ) as Record<string, number>
     },
   })
 }

@@ -50,7 +50,7 @@ export function PiggyPage() {
             <PiggyRow
               key={p.id}
               fund={p}
-              saved={balances?.get(p.id) ?? 0}
+              saved={balances?.[p.id] ?? 0}
               month={month}
             />
           ))}
@@ -67,7 +67,7 @@ export function PiggyPage() {
               <AchievedRow
                 key={p.id}
                 fund={p}
-                saved={balances?.get(p.id) ?? 0}
+                saved={balances?.[p.id] ?? 0}
               />
             ))}
           </ul>

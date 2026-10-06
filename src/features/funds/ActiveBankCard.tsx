@@ -31,7 +31,7 @@ export function ActiveBankCard({ month }: { month: Month }) {
       )
     : []
   const spent = spends.reduce((s, e) => s + e.amount_cents, 0)
-  const balance = bank ? (balances?.get(bank.id) ?? 0) : 0
+  const balance = bank ? (balances?.[bank.id] ?? 0) : 0
   const label = monthLabel(month.year, month.month)
 
   return (

@@ -40,7 +40,7 @@ export function PiggySummaryCard() {
       ) : (
         <ul className="flex flex-col gap-3">
           {open.map((p) => {
-            const saved = balances?.get(p.id) ?? 0
+            const saved = balances?.[p.id] ?? 0
             const goal = p.goal_cents ?? 0
             const pct = goal > 0 ? Math.min(100, (saved / goal) * 100) : 0
             return (
