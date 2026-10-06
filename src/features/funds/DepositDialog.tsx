@@ -39,8 +39,8 @@ export function DepositDialog({
   const deposit = useDepositToFund()
 
   const submit = () => {
-    const e = essential.trim() === '' ? parseBrlToCents(essential) : 0
-    const f = fun.trim() === '' ? parseBrlToCents(fun) : 0
+    const e = essential.trim() === '' ? 0 : parseBrlToCents(essential)
+    const f = fun.trim() === '' ? 0 : parseBrlToCents(fun)
     if (e === null || f === null || e < 0 || f < 0) {
       setError('Informe valores válidos (ex.: 250,00)')
       return
