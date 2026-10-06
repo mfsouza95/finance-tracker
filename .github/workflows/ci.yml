@@ -30,6 +30,10 @@ jobs:
       SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET: ci-dummy-secret
     steps:
       - uses: actions/checkout@v4
+      # Pin to the version that generated config.toml — older CLIs fail to
+      # parse newer config keys.
       - uses: supabase/setup-cli@v1
+        with:
+          version: 2.119.0
       - run: supabase db start
       - run: supabase test db
