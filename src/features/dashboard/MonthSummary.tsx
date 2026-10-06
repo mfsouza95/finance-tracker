@@ -90,6 +90,14 @@ export function MonthSummary({ month }: { month: Month }) {
         </div>
         <div>
           <dt className="text-muted-foreground text-xs">
+            Investimento fixo ({month.invest_pct}%)
+          </dt>
+          <dd>
+            <Money cents={buckets.invest} size="sm" />
+          </dd>
+        </div>
+        <div>
+          <dt className="text-muted-foreground text-xs">
             Investimento previsto
           </dt>
           <dd>
