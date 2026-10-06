@@ -34,6 +34,16 @@ export function SignInPage() {
     }
   }
 
+  const onGoogle = async () => {
+    setError(null)
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    })
+    // On success the browser leaves for Google; only an error returns here.
+    if (error) setError(error.message)
+  }
+
   return (
     <main>
       <h1>Entrar</h1>
@@ -55,6 +65,13 @@ export function SignInPage() {
           {error && <p role="alert">{error}</p>}
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Enviando…' : 'Enviar link de acesso'}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => void onGoogle()}
+          >
+            Entrar com Google
           </Button>
         </form>
       )}

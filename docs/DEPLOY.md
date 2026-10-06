@@ -25,10 +25,26 @@ scheduled jobs (already in `.github/workflows/`).
 
 4. Auth URL config — in the dashboard: **Authentication → URL Configuration**:
    - Site URL: your prod domain (e.g. `https://finance.example.com`)
-   - Redirect URLs: add `https://<your-domain>/**` — the magic link sends
-     `emailRedirectTo: window.location.origin`, so the deployed origin must be
-     allow-listed or the link bounces to Site URL / fails. Keep
-     `http://localhost:5175` listed so local dev keeps working.
+   - Redirect URLs: add `https://<your-domain>/**` — both the magic link and
+     Google OAuth send the user back to `window.location.origin`, so the
+     deployed origin must be allow-listed or the redirect bounces to Site
+     URL / fails. Keep `http://localhost:5175` listed so local dev keeps
+     working.
+
+5. Google sign-in — **Authentication → Sign In / Providers → Google**:
+   - In Google Cloud Console: create a project → APIs & Services → OAuth
+     consent screen (External, fill app name/email) → Credentials → Create
+     Credentials → **OAuth client ID** → type "Web application".
+   - Authorized redirect URI: `https://<ref>.supabase.co/auth/v1/callback`
+     (Supabase shows the exact URL on the provider settings page). For local
+     dev also add `http://127.0.0.1:54321/auth/v1/callback`.
+   - Paste the Client ID + Client Secret into the Supabase provider form and
+     enable it. Done — the "Entrar com Google" button is already in the app.
+   - For the local stack, set `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and
+     `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` as env vars before
+     `pnpm supabase start` (config.toml reads them via `env(...)`); or just
+     test Google sign-in on prod — one credential set works for both if you
+     list both callback URLs.
 
 ## 2. Hosting (pick one)
 
@@ -70,7 +86,8 @@ Repo → Settings → Secrets and variables → Actions:
 
 ## 4. First prod login
 
-Magic links on prod go to your real inbox (no Mailpit). Sign in with your
-email — the signup trigger creates `profiles` + `budget_settings`
-automatically, then open the current month. If a link 404s, check the
-redirect URL allow-list in step 1.4 first — it is almost always that.
+Prefer "Entrar com Google" — it skips email deliverability entirely. Magic
+links still work but go through Supabase's rate-limited free SMTP. Either
+way the signup trigger creates `profiles` + `budget_settings` automatically,
+then open the current month. If a redirect 404s, check the URL allow-list in
+step 1.4 first — it is almost always that.
