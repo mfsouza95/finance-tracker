@@ -32,14 +32,17 @@ export function Dashboard() {
   // Three visual bands: summary-ish cards (3 cols), the two spending
   // buckets side by side (2 cols), then fund management (3 cols again).
   // Each band collapses to 2/1 columns below 2xl/md respectively.
+  // The bucket band is flex-1 + auto-rows-fr: it absorbs whatever
+  // vertical space the other bands leave, so Essencial/Lazer dominate
+  // the screen.
   return (
-    <div className="flex flex-col gap-4 sm:gap-6">
+    <div className="flex flex-1 flex-col gap-4 sm:gap-6">
       <div className="grid grid-cols-1 items-stretch gap-4 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
         <MonthSummary month={month} />
         <RecurringPanel />
         <ActiveBankCard month={month} />
       </div>
-      <div className="grid grid-cols-1 items-stretch gap-4 sm:gap-6 md:grid-cols-2">
+      <div className="grid flex-auto auto-rows-fr grid-cols-1 items-stretch gap-4 sm:gap-6 md:grid-cols-2">
         <BucketPanel month={month} bucket="essential" title="Essencial" />
         <BucketPanel month={month} bucket="fun" title="Lazer" />
       </div>
