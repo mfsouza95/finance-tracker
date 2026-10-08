@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/lib/supabase'
 
+import { MoneyRain } from './MoneyRain'
+
 const schema = z.object({
   email: z.email('Informe um e-mail válido'),
   password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
@@ -127,8 +129,21 @@ export function SignInPage() {
   const fieldError = errors.email?.message ?? errors.password?.message
 
   return (
-    <main className="flex min-h-svh items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm rounded-2xl border bg-card p-8 shadow-sm">
+    <main className="relative flex min-h-svh items-center justify-center overflow-hidden bg-background px-4">
+      {/* Lamp glow: an ellipse centered below the viewport bottom, so only
+          its upper dome is visible — like light rising from under the
+          monitor. The primary token keeps it red in both modes. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 26% 20% at 50% 108%, color-mix(in srgb, var(--primary) 30%, transparent) 0%, transparent 70%),' +
+            'radial-gradient(ellipse 62% 50% at 50% 118%, color-mix(in srgb, var(--primary) 16%, transparent) 0%, transparent 70%)',
+        }}
+      />
+      <MoneyRain />
+      <div className="relative z-10 w-full max-w-sm rounded-2xl border bg-card p-8 shadow-sm">
         <div className="mb-6 space-y-1 text-center">
           <p className="text-xs font-medium uppercase tracking-widest text-primary">
             finance tracker

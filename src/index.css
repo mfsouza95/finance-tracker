@@ -197,3 +197,24 @@
     @apply font-sans;
     }
 }
+
+/* Money rain (login screen): the wrapper element falls, the inner sprite
+   sways/rotates around --sway/--rot custom props set inline per item. */
+@keyframes money-fall {
+  from { transform: translateY(-15vh); }
+  to { transform: translateY(115vh); }
+}
+@keyframes money-sway {
+  0%, 100% {
+    transform: translateX(calc(var(--sway, 16px) * -1))
+      rotate(calc(var(--rot, 14deg) * -1));
+  }
+  50% {
+    transform: translateX(var(--sway, 16px)) rotate(var(--rot, 14deg));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .money-rain-layer {
+    display: none;
+  }
+}
