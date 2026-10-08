@@ -287,7 +287,7 @@ function CreateTemplateForm({
                 </option>
               ))}
           </optgroup>
-          <optgroup label="Diversão">
+          <optgroup label="Lazer">
             <option value={`${UNCAT_PREFIX}fun`}>Sem categoria</option>
             {categories
               .filter((c) => c.bucket === 'fun')

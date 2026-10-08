@@ -118,7 +118,7 @@ export function MonthSettingsDialog({ month }: { month: Month }) {
             {(
               [
                 ['essential', 'Essencial %'],
-                ['fun', 'Diversão %'],
+                ['fun', 'Lazer %'],
                 ['invest', 'Investir %'],
               ] as const
             ).map(([field, label]) => (

@@ -122,7 +122,7 @@ export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
                 </option>
               ))}
           </optgroup>
-          <optgroup label="Diversão">
+          <optgroup label="Lazer">
             <option value="uncat:fun">Sem categoria</option>
             {active
               .filter((c) => c.bucket === 'fun')

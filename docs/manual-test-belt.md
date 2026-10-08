@@ -22,7 +22,7 @@ runs with `supabase db reset` if you want a clean slate.
 
 ## 3. Categories
 
-- [ ] "Gerenciar categorias" → add a category to Essencial (e.g. Mercado) and one to Diversão (e.g. Streaming)
+- [ ] "Gerenciar categorias" → add a category to Essencial (e.g. Mercado) and one to Lazer (e.g. Streaming)
 - [ ] Same name twice in the same bucket → "Já existe uma categoria com esse nome"
 - [ ] Same name in the OTHER bucket → allowed
 - [ ] Archive a category → struck through in manager, gone from the entry form's select
@@ -98,8 +98,8 @@ runs with `supabase db reset` if you want a clean slate.
 - [ ] Reservas panel → Novo: name only → bank appears in the list with the switch on
 - [ ] Reserva ativa card → the new bank shows; with 2+ active banks, ◀/▶ cycle through them (e.g. `1/2`)
 - [ ] Depositar (+ icon): put 100 in Essencial only → a "Reservas" category appears in Essencial with the entry; Essencial Gasto rises 100; bank balance shows 100
-- [ ] Depositar with a split (Essencial + Diversão) → one entry in each bucket, balance = the sum
-- [ ] "Lançar gasto" → the bank's name appears under a Reservas optgroup; log an entry against it → it shows nowhere in Essencial/Diversão, appears in the Reserva ativa card, balance drops
+- [ ] Depositar with a split (Essencial + Lazer) → one entry in each bucket, balance = the sum
+- [ ] "Lançar gasto" → the bank's name appears under a Reservas optgroup; log an entry against it → it shows nowhere in Essencial/Lazer, appears in the Reserva ativa card, balance drops
 - [ ] Try to log more than the bank has → rejected ("insufficient fund balance")
 - [ ] Switch the bank off → it disappears from the add-entry select and the Reserva ativa card, stays in the Reservas list
 - [ ] Delete a bank with a balance → dialog offers "move to extras of the current month": accept → extra appears in Extras (fun budget grows); decline → fund gone, money vanishes

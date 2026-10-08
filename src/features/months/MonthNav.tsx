@@ -34,7 +34,7 @@ export function MonthNav() {
       </Button>
       {/* Fixed width keeps the chevrons from jumping between short/long
           month names. */}
-      <span className="w-36 text-center text-sm font-semibold capitalize">
+      <span className="w-28 text-center text-sm font-semibold capitalize sm:w-36">
         {monthLabel(ym.year, ym.month)}
       </span>
       <Button

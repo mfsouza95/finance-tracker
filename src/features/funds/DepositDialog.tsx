@@ -106,7 +106,7 @@ export function DepositDialog({
           </div>
           <div className="flex flex-col gap-1.5">
             <label htmlFor="dep-fun" className="text-sm font-medium">
-              Da Diversão
+              Do Lazer
             </label>
             <Input
               id="dep-fun"

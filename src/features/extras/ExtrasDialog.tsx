@@ -39,7 +39,7 @@ export function ExtrasDialog({ month }: { month: Month }) {
         <DialogHeader>
           <DialogTitle>Extras recebidos</DialogTitle>
           <DialogDescription>
-            Valores fora da renda — vão 100% para Diversão.
+            Valores fora da renda — vão 100% para o Lazer.
           </DialogDescription>
         </DialogHeader>
 

@@ -47,7 +47,7 @@ export function HistoryPanel() {
               </dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">Diversão</dt>
+              <dt className="text-muted-foreground">Lazer</dt>
               <dd>
                 <Money cents={s.fun_rest_cents} size="sm" sign="sign" />
               </dd>

@@ -65,7 +65,7 @@ export function CategoryManager({ bucket, categories }: CategoryManagerProps) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            Categorias — {bucket === 'essential' ? 'Essencial' : 'Diversão'}
+            Categorias — {bucket === 'essential' ? 'Essencial' : 'Lazer'}
           </DialogTitle>
           <DialogDescription>
             Crie, arquive ou restaure categorias deste pote.

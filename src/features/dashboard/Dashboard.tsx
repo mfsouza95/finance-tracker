@@ -29,15 +29,24 @@ export function Dashboard() {
     return <OpenMonthPrompt />
   }
 
+  // Three visual bands: summary-ish cards (3 cols), the two spending
+  // buckets side by side (2 cols), then fund management (3 cols again).
+  // Each band collapses to 2/1 columns below 2xl/md respectively.
   return (
-    <div className="grid grid-cols-3 items-stretch gap-6">
-      <MonthSummary month={month} />
-      <BucketPanel month={month} bucket="essential" title="Essencial" />
-      <BucketPanel month={month} bucket="fun" title="Diversão" />
-      <RecurringPanel />
-      <BanksPanel month={month} />
-      <ActiveBankCard month={month} />
-      <PiggySummaryCard />
+    <div className="flex flex-col gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 items-stretch gap-4 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
+        <MonthSummary month={month} />
+        <RecurringPanel />
+        <ActiveBankCard month={month} />
+      </div>
+      <div className="grid grid-cols-1 items-stretch gap-4 sm:gap-6 md:grid-cols-2">
+        <BucketPanel month={month} bucket="essential" title="Essencial" />
+        <BucketPanel month={month} bucket="fun" title="Lazer" />
+      </div>
+      <div className="grid grid-cols-1 items-stretch gap-4 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
+        <BanksPanel month={month} />
+        <PiggySummaryCard />
+      </div>
     </div>
   )
 }
