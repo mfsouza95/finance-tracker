@@ -1,32 +1,38 @@
-import { ChevronRight } from 'lucide-react'
+import { RotateCcw } from 'lucide-react'
 
 import { EmptyState } from '@/components/EmptyState'
 import { Money } from '@/components/Money'
 import { Badge } from '@/components/ui/badge'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
-import { formatISODate } from '@/lib/dates'
+import { Button } from '@/components/ui/button'
 import { useMonth } from '@/features/months/hooks'
 import { useSelectedMonth } from '@/features/months/selectedMonth'
 
 import type { Fund } from './hooks'
-import { useFundBalances, useFundHistory, useFunds } from './hooks'
+import {
+  useFundBalances,
+  useFundSpendCounts,
+  useFunds,
+  useRestoreFund,
+} from './hooks'
 import { BankRow, CreateFundDialog } from './BanksPanel'
+import { FundHistoryRow } from './FundHistoryRow'
 
 // Full bank (reserva) management: create, activate/deactivate, deposit,
-// complete and delete. Completed banks keep their rows below with the
-// full entry history — unlike deleted ones, which lose the link.
+// complete and delete. Completed banks live in the month history;
+// deletion-flagged ones wait here in Excluídas until the month closes —
+// recoverable with the restore button.
 export function BanksPage() {
   const { ym } = useSelectedMonth()
   const { data: month } = useMonth(ym.year, ym.month)
   const { data: banks, isLoading } = useFunds('bank')
   const { data: balances } = useFundBalances()
+  const { data: spendCounts } = useFundSpendCounts()
+  const restore = useRestoreFund()
 
-  const live = (banks ?? []).filter((b) => b.completed_at === null)
-  const completed = (banks ?? []).filter((b) => b.completed_at !== null)
+  const live = (banks ?? []).filter(
+    (b) => b.completed_at === null && b.deleted_at === null,
+  )
+  const deleted = (banks ?? []).filter((b) => b.deleted_at !== null)
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
@@ -52,6 +58,7 @@ export function BanksPage() {
                 key={b.id}
                 fund={b}
                 balance={balances?.[b.id] ?? 0}
+                hasSpends={(spendCounts?.[b.id] ?? 0) > 0}
                 month={month}
               />
             ))}
@@ -59,14 +66,24 @@ export function BanksPage() {
         )}
       </section>
 
-      {completed.length > 0 && (
+      {deleted.length > 0 && (
         <section className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4">
           <h2 className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
-            Concluídas
+            Excluídas
           </h2>
+          <p className="text-muted-foreground text-xs">
+            Serão excluídas permanentemente quando o mês atual fechar — o
+            saldo restante vai para os extras daquele mês.
+          </p>
           <div className="flex flex-col">
-            {completed.map((b) => (
-              <CompletedBankRow key={b.id} fund={b} />
+            {deleted.map((b) => (
+              <DeletedBankRow
+                key={b.id}
+                fund={b}
+                balance={balances?.[b.id] ?? 0}
+                onRestore={() => restore.mutate(b.id)}
+                restoring={restore.isPending}
+              />
             ))}
           </div>
         </section>
@@ -75,49 +92,37 @@ export function BanksPage() {
   )
 }
 
-function CompletedBankRow({ fund }: { fund: Fund }) {
-  const { data: history } = useFundHistory(fund.id)
-
+function DeletedBankRow({
+  fund,
+  balance,
+  onRestore,
+  restoring,
+}: {
+  fund: Fund
+  balance: number
+  onRestore: () => void
+  restoring: boolean
+}) {
   return (
-    <Collapsible>
-      <CollapsibleTrigger className="group flex w-full items-center gap-2 rounded-md px-2 py-2 text-left hover:bg-muted">
-        <ChevronRight className="size-4 shrink-0 transition-transform group-data-[state=open]:rotate-90" />
-        <span className="flex-1 truncate text-sm font-medium">{fund.name}</span>
-        <span className="text-muted-foreground text-xs tabular-nums">
-          {history?.length ?? 0}
-        </span>
-        <Badge variant="secondary">
-          {fund.completed_at
-            ? formatISODate(fund.completed_at.slice(0, 10))
-            : 'Concluída'}
-        </Badge>
-      </CollapsibleTrigger>
-      <CollapsibleContent>
-        <ul className="border-border mt-1 ml-6 flex max-h-64 flex-col divide-y overflow-y-auto border-l pl-2">
-          {(history ?? []).map((e) => (
-            <li
-              key={e.id}
-              className="flex items-center gap-2 py-1.5 pr-1 text-sm"
-            >
-              <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
-                {formatISODate(e.paid_on)}
-              </span>
-              <span className="flex-1 truncate">{e.note ?? '—'}</span>
-              <Money
-                cents={e.fund_flow === 'in' ? e.amount_cents : -e.amount_cents}
-                size="sm"
-                sign="sign"
-                tone={e.fund_flow === 'in' ? 'positive' : 'negative'}
-              />
-            </li>
-          ))}
-          {(history ?? []).length === 0 && (
-            <li className="text-muted-foreground py-1.5 text-xs">
-              Nenhuma entrada
-            </li>
-          )}
-        </ul>
-      </CollapsibleContent>
-    </Collapsible>
+    <FundHistoryRow
+      fund={fund}
+      badge={
+        <>
+          <Money cents={balance} size="sm" />
+          <Badge variant="destructive">Excluída</Badge>
+        </>
+      }
+      action={
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={`Recuperar ${fund.name}`}
+          onClick={onRestore}
+          disabled={restoring}
+        >
+          <RotateCcw className="size-3.5" />
+        </Button>
+      }
+    />
   )
 }

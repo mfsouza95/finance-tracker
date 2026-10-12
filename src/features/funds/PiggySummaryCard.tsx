@@ -66,7 +66,7 @@ export function PiggySummaryCard() {
                   >
                     <Check className="size-3.5" />
                   </Button>
-                  <DeleteFundDialog fund={p} balance={saved} />
+                  <DeleteFundDialog fund={p} balance={saved} hasSpends={false} />
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-input">
                   <div

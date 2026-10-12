@@ -103,9 +103,13 @@ runs with `supabase db reset` if you want a clean slate.
 - [ ] Try to log more than the bank has → rejected ("insufficient fund balance")
 - [ ] Switch the bank off → it disappears from the add-entry select and the Reserva ativa card, stays in the Reservas list
 - [ ] Reserva ativa card with 5+ spends → list scrolls, every spend reachable, card height stays fixed
-- [ ] Concluir a bank with balance (✓ icon) → same extras choice as delete: accept → extras grow; either way balance drains to 0 via a "Concluída" entry and the bank moves to Concluídas on /reservas
-- [ ] Expand a completed bank → every deposit, spend and the drain row listed with dates and signs; fund_id kept (unlike delete, which orphans the rows)
+- [ ] Concluir a bank with balance (✓ icon) → same extras choice as delete: accept → extras grow; either way balance drains to 0 via a "Concluída" entry and the bank appears under that month in Histórico
+- [ ] Expand a completed bank in Histórico → every deposit, spend and the drain row listed with dates and signs; Reabrir brings the bank back at zero (drain stays in the ledger)
 - [ ] Try completing the same bank twice or spending from a completed bank → rejected
-- [ ] Delete a bank with a balance → dialog offers "move to extras of the current month": accept → extra appears in Extras (fun budget grows); decline → fund gone, money vanishes
+- [ ] Delete a bank with NO spends → erased for real; with balance the dialog offers extras-or-discard plus "Mudei de ideia, não excluir" (just cancels)
+- [ ] Delete a bank WITH spends → dialog warns it only goes when the month closes; bank moves to Excluídas on /reservas with its balance and a Recuperar button
+- [ ] Recuperar a flagged bank → returns to the live list, active, balance intact
+- [ ] Close the current month with a flagged bank → bank gone forever, remaining balance appears in Extras (and in the summary's extra_income_cents)
+- [ ] Close a non-current month (e.g. next month) → flagged banks untouched
 - [ ] /cofrinhos → Novo: name + goal required; progress bar fills as deposits land; ✓ moves it to Concluídos (undo brings it back); delete offers the same extras transfer
 - [ ] Deposit and entries on a closed month are rejected (read-only still holds)

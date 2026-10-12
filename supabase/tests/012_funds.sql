@@ -7,7 +7,7 @@ create extension if not exists pgtap;
 
 begin;
 
-select plan(18);
+select plan(19);
 
 -- ----------------------------------------------------------------
 -- Fixtures
@@ -156,20 +156,30 @@ select is(
   20000::bigint, 'fun spent is the deposit only');
 
 -- ----------------------------------------------------------------
--- delete_fund with extras transfer: balance 35000 lands in the
--- currently open month''s extra_income, then the fund is gone.
+-- delete_fund on a bank WITH spend history only flags it (soft delete):
+-- balance stays parked until the current month closes, when close_month
+-- purges the row and lands the 35000 in that month's extra_income.
 -- ----------------------------------------------------------------
 select public.delete_fund(
   (select id from public.funds where name = 'Viagem'), true);
 
+select ok(
+  (select deleted_at is not null from public.funds where name = 'Viagem'),
+  'a bank with spends is flagged for deletion, not erased');
+
+select public.close_month(
+  (select id from public.months
+   where year = extract(year from current_date)::smallint
+     and month = extract(month from current_date)::smallint), 0);
+
 select is(
   (select count(*)::int from public.extra_income
    where note = 'Reserva: Viagem' and amount_cents = 35000),
-  1, 'delete_fund moves the balance into extras of the open month');
+  1, 'close_month purge moves the balance into extras');
 
 select is(
   (select count(*)::int from public.funds where name = 'Viagem'),
-  0, 'fund row is gone after delete_fund');
+  0, 'flagged fund row is gone after the month closes');
 
 -- Direct delete is not allowed: no delete policy exists, so a client
 -- delete affects zero rows instead of the row.

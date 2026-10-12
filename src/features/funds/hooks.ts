@@ -169,6 +169,28 @@ export function useCompleteFund() {
   })
 }
 
+/** fund_id -> number of spend entries ('out'). One small query shared by
+ * every row, since delete splits by history: spendless banks erase for
+ * real, banks with spends are only flagged until the month closes. */
+export function useFundSpendCounts() {
+  return useQuery({
+    queryKey: ['fund_spend_counts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('entries')
+        .select('fund_id')
+        .eq('fund_flow', 'out')
+        .not('fund_id', 'is', null)
+      if (error) throw error
+      const counts: Record<string, number> = {}
+      for (const e of data) {
+        counts[e.fund_id!] = (counts[e.fund_id!] ?? 0) + 1
+      }
+      return counts
+    },
+  })
+}
+
 export function useDeleteFund() {
   const qc = useQueryClient()
   return useMutation({
@@ -183,8 +205,44 @@ export function useDeleteFund() {
       qc.invalidateQueries({ queryKey: ['funds'] })
       qc.invalidateQueries({ queryKey: ['fund_balances'] })
       qc.invalidateQueries({ queryKey: ['fund_entries'] })
+      qc.invalidateQueries({ queryKey: ['fund_history'] })
       qc.invalidateQueries({ queryKey: ['entries'] })
       qc.invalidateQueries({ queryKey: ['extras'] })
+    },
+  })
+}
+
+/** Un-flag a pending deletion: bank comes back active, balance untouched. */
+export function useRestoreFund() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (fundId: string) => {
+      const { error } = await supabase.rpc('restore_fund', {
+        p_fund_id: fundId,
+      })
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['funds'] })
+      qc.invalidateQueries({ queryKey: ['fund_balances'] })
+    },
+  })
+}
+
+/** Undo a completion — the drain stays in the ledger, so the bank returns
+ * at zero balance. Reopening revives it, it doesn't rewind. */
+export function useReopenFund() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (fundId: string) => {
+      const { error } = await supabase.rpc('reopen_fund', {
+        p_fund_id: fundId,
+      })
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['funds'] })
+      qc.invalidateQueries({ queryKey: ['fund_balances'] })
     },
   })
 }

@@ -112,7 +112,7 @@ function PiggyRow({
         >
           <Check className="size-3.5" />
         </Button>
-        <DeleteFundDialog fund={fund} balance={saved} />
+        <DeleteFundDialog fund={fund} balance={saved} hasSpends={false} />
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-input">
         <div
@@ -147,7 +147,7 @@ function AchievedRow({ fund, saved }: { fund: Fund; saved: number }) {
       >
         <Undo2 className="size-3.5" />
       </Button>
-      <DeleteFundDialog fund={fund} balance={saved} />
+      <DeleteFundDialog fund={fund} balance={saved} hasSpends={false} />
     </li>
   )
 }

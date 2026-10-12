@@ -22,6 +22,7 @@ import type { Fund } from './hooks'
 import {
   useCreateFund,
   useFundBalances,
+  useFundSpendCounts,
   useFunds,
   useUpdateFund,
 } from './hooks'
@@ -30,12 +31,16 @@ import { DeleteFundDialog } from './DeleteFundDialog'
 import { DepositDialog } from './DepositDialog'
 
 // All live banks the user has, each with an active switch, deposit and
-// delete. Completed banks are excluded — their history lives on /reservas.
+// delete. Completed banks live in the month history and deletion-flagged
+// ones in the Excluídas section on /reservas — both are excluded here.
 // Active banks show up as "categories" when logging entries.
 export function BanksPanel({ month }: { month: Month }) {
   const { data: banks, isLoading } = useFunds('bank')
   const { data: balances } = useFundBalances()
-  const live = (banks ?? []).filter((b) => b.completed_at === null)
+  const { data: spendCounts } = useFundSpendCounts()
+  const live = (banks ?? []).filter(
+    (b) => b.completed_at === null && b.deleted_at === null,
+  )
 
   return (
     <section className="flex h-full flex-col gap-3 rounded-lg border border-border bg-card p-4">
@@ -62,6 +67,7 @@ export function BanksPanel({ month }: { month: Month }) {
               key={b.id}
               fund={b}
               balance={balances?.[b.id] ?? 0}
+              hasSpends={(spendCounts?.[b.id] ?? 0) > 0}
               month={month}
             />
           ))}
@@ -74,10 +80,12 @@ export function BanksPanel({ month }: { month: Month }) {
 export function BankRow({
   fund,
   balance,
+  hasSpends,
   month,
 }: {
   fund: Fund
   balance: number
+  hasSpends: boolean
   month: Month | null | undefined
 }) {
   const update = useUpdateFund()
@@ -106,7 +114,7 @@ export function BankRow({
       <Money cents={balance} size="sm" />
       {month && <DepositDialog fund={fund} month={month} />}
       <CompleteFundDialog fund={fund} balance={balance} />
-      <DeleteFundDialog fund={fund} balance={balance} />
+      <DeleteFundDialog fund={fund} balance={balance} hasSpends={hasSpends} />
     </li>
   )
 }

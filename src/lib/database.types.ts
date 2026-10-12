@@ -107,13 +107,13 @@ isOneToOne: false
                   ]
                 },"funds": {
                   Row: {
-                    "achieved_at": string | null,"active": boolean,"completed_at": string | null,"created_at": string,"goal_cents": number | null,"id": string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
+                    "achieved_at": string | null,"active": boolean,"completed_at": string | null,"created_at": string,"deleted_at": string | null,"goal_cents": number | null,"id": string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
                   }
                   Insert: {
-                    "achieved_at"?: string | null,"active"?: boolean,"completed_at"?: string | null,"created_at"?: string,"goal_cents"?: number | null,"id"?: string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
+                    "achieved_at"?: string | null,"active"?: boolean,"completed_at"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"goal_cents"?: number | null,"id"?: string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
                   }
                   Update: {
-                    "achieved_at"?: string | null,"active"?: boolean,"completed_at"?: string | null,"created_at"?: string,"goal_cents"?: number | null,"id"?: string,"kind"?: Database["public"]['Enums']["fund_kind"],"name"?: string,"user_id"?: string
+                    "achieved_at"?: string | null,"active"?: boolean,"completed_at"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"goal_cents"?: number | null,"id"?: string,"kind"?: Database["public"]['Enums']["fund_kind"],"name"?: string,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -268,6 +268,9 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"reopen_fund":
+{ Args: { "p_fund_id": string }; Returns: undefined
+                           },
 "reopen_month":
 { Args: { "month_id": string }; Returns: {
               "closed_at": string | null,
@@ -288,7 +291,10 @@ isOneToOne: false
         to: "months"
         isOneToOne: true
         isSetofReturn: false
-      } }
+      } },
+"restore_fund":
+{ Args: { "p_fund_id": string }; Returns: undefined
+                           }
           }
           Enums: {
             "bucket": "essential"|"fun","fund_kind": "bank"|"piggy","month_status": "open"|"closed"
