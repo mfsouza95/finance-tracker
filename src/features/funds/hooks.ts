@@ -130,6 +130,45 @@ export function useDepositToFund() {
   })
 }
 
+/** All entries ever written against a fund — the readable history that
+ * survives completion (fund_id is kept, unlike delete). */
+export function useFundHistory(fundId: string | undefined) {
+  return useQuery({
+    enabled: fundId !== undefined,
+    queryKey: ['fund_history', fundId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('entries')
+        .select('*')
+        .eq('fund_id', fundId!)
+        .order('paid_on', { ascending: false })
+      if (error) throw error
+      return data
+    },
+  })
+}
+
+export function useCompleteFund() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (vars: { fundId: string; moveToExtras: boolean }) => {
+      const { error } = await supabase.rpc('complete_fund', {
+        p_fund_id: vars.fundId,
+        p_move_to_extras: vars.moveToExtras,
+      })
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['funds'] })
+      qc.invalidateQueries({ queryKey: ['fund_balances'] })
+      qc.invalidateQueries({ queryKey: ['fund_entries'] })
+      qc.invalidateQueries({ queryKey: ['fund_history'] })
+      qc.invalidateQueries({ queryKey: ['entries'] })
+      qc.invalidateQueries({ queryKey: ['extras'] })
+    },
+  })
+}
+
 export function useDeleteFund() {
   const qc = useQueryClient()
   return useMutation({

@@ -25,14 +25,17 @@ import {
   useFunds,
   useUpdateFund,
 } from './hooks'
+import { CompleteFundDialog } from './CompleteFundDialog'
 import { DeleteFundDialog } from './DeleteFundDialog'
 import { DepositDialog } from './DepositDialog'
 
-// All banks the user has, each with an active switch, deposit and delete.
+// All live banks the user has, each with an active switch, deposit and
+// delete. Completed banks are excluded — their history lives on /reservas.
 // Active banks show up as "categories" when logging entries.
 export function BanksPanel({ month }: { month: Month }) {
   const { data: banks, isLoading } = useFunds('bank')
   const { data: balances } = useFundBalances()
+  const live = (banks ?? []).filter((b) => b.completed_at === null)
 
   return (
     <section className="flex h-full flex-col gap-3 rounded-lg border border-border bg-card p-4">
@@ -47,14 +50,14 @@ export function BanksPanel({ month }: { month: Month }) {
 
       {isLoading ? (
         <p className="text-muted-foreground text-sm">Carregando…</p>
-      ) : !banks?.length ? (
+      ) : !live.length ? (
         <EmptyState
           title="Sem reservas"
           description="Crie uma reserva para guardar dinheiro fora dos potes."
         />
       ) : (
         <ul className="flex flex-col divide-y divide-border">
-          {banks.map((b) => (
+          {live.map((b) => (
             <BankRow
               key={b.id}
               fund={b}
@@ -102,6 +105,7 @@ export function BankRow({
       <span className="flex-1 truncate text-sm font-medium">{fund.name}</span>
       <Money cents={balance} size="sm" />
       {month && <DepositDialog fund={fund} month={month} />}
+      <CompleteFundDialog fund={fund} balance={balance} />
       <DeleteFundDialog fund={fund} balance={balance} />
     </li>
   )

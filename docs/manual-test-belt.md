@@ -102,6 +102,10 @@ runs with `supabase db reset` if you want a clean slate.
 - [ ] "Lançar gasto" → the bank's name appears under a Reservas optgroup; log an entry against it → it shows nowhere in Essencial/Lazer, appears in the Reserva ativa card, balance drops
 - [ ] Try to log more than the bank has → rejected ("insufficient fund balance")
 - [ ] Switch the bank off → it disappears from the add-entry select and the Reserva ativa card, stays in the Reservas list
+- [ ] Reserva ativa card with 5+ spends → list scrolls, every spend reachable, card height stays fixed
+- [ ] Concluir a bank with balance (✓ icon) → same extras choice as delete: accept → extras grow; either way balance drains to 0 via a "Concluída" entry and the bank moves to Concluídas on /reservas
+- [ ] Expand a completed bank → every deposit, spend and the drain row listed with dates and signs; fund_id kept (unlike delete, which orphans the rows)
+- [ ] Try completing the same bank twice or spending from a completed bank → rejected
 - [ ] Delete a bank with a balance → dialog offers "move to extras of the current month": accept → extra appears in Extras (fun budget grows); decline → fund gone, money vanishes
 - [ ] /cofrinhos → Novo: name + goal required; progress bar fills as deposits land; ✓ moves it to Concluídos (undo brings it back); delete offers the same extras transfer
 - [ ] Deposit and entries on a closed month are rejected (read-only still holds)

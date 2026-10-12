@@ -93,8 +93,8 @@ export function ActiveBankCard({ month }: { month: Month }) {
           </div>
 
           {spends.length > 0 && (
-            <ul className="mt-auto flex flex-col gap-1 border-t border-border pt-2">
-              {spends.slice(0, 4).map((e) => (
+            <ul className="mt-auto flex max-h-40 flex-col gap-1 overflow-y-auto border-t border-border pt-2 pr-1">
+              {spends.map((e) => (
                 <li
                   key={e.id}
                   className="flex items-center justify-between gap-2 text-sm"
@@ -123,11 +123,6 @@ export function ActiveBankCard({ month }: { month: Month }) {
                   )}
                 </li>
               ))}
-              {spends.length > 4 && (
-                <li className="text-xs text-muted-foreground">
-                  + {spends.length - 4} lançamento(s)
-                </li>
-              )}
             </ul>
           )}
         </>

@@ -107,13 +107,13 @@ isOneToOne: false
                   ]
                 },"funds": {
                   Row: {
-                    "achieved_at": string | null,"active": boolean,"created_at": string,"goal_cents": number | null,"id": string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
+                    "achieved_at": string | null,"active": boolean,"completed_at": string | null,"created_at": string,"goal_cents": number | null,"id": string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
                   }
                   Insert: {
-                    "achieved_at"?: string | null,"active"?: boolean,"created_at"?: string,"goal_cents"?: number | null,"id"?: string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
+                    "achieved_at"?: string | null,"active"?: boolean,"completed_at"?: string | null,"created_at"?: string,"goal_cents"?: number | null,"id"?: string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
                   }
                   Update: {
-                    "achieved_at"?: string | null,"active"?: boolean,"created_at"?: string,"goal_cents"?: number | null,"id"?: string,"kind"?: Database["public"]['Enums']["fund_kind"],"name"?: string,"user_id"?: string
+                    "achieved_at"?: string | null,"active"?: boolean,"completed_at"?: string | null,"created_at"?: string,"goal_cents"?: number | null,"id"?: string,"kind"?: Database["public"]['Enums']["fund_kind"],"name"?: string,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -217,6 +217,9 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"complete_fund":
+{ Args: { "p_fund_id": string,"p_move_to_extras"?: boolean }; Returns: undefined
+                           },
 "create_recurring_template":
 { Args: { "p_amount_cents": number,"p_bucket"?: Database["public"]['Enums']["bucket"],"p_category_id"?: string,"p_day_of_month": number,"p_first_month"?: number,"p_first_year"?: number,"p_installments_total"?: number,"p_label": string }; Returns: {
               "active": boolean,
