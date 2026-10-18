@@ -103,7 +103,33 @@ Repo → Settings → Secrets and variables → Actions:
   workflow artifact (90-day retention). Test a restore once: load the dump
   into a fresh local DB with `psql`.
 
-## 4. First prod login
+## 4. Day-to-day deploys
+
+Once running, **pushing to `main` deploys both sides at once**: Vercel
+ships the frontend and the Supabase GitHub integration auto-applies any new
+files in `supabase/migrations/` to the prod database.
+
+Because of that, the repo convention is:
+
+- **Schema changes ride a PR.** Anything touching `supabase/migrations/` or
+  `supabase/tests/` goes through a branch + pull request (even if merged
+  immediately): CI runs the full pgTAP suite against a clean container, so a
+  broken migration cannot reach auto-deploy. The PR also gets a free Vercel
+  preview build.
+- **Everything else** (UI, copy, docs) can go straight to `main`.
+- **`pnpm supabase db push` is only for bootstrap and drift repair.** When
+  the integration applies a migration first, a later manual push errors on
+  `column ... already exists` — harmless: it means the content is already
+  applied, and the push records the missing version row. Verify with
+  `pnpm supabase migration list` + `pnpm supabase db pull` ("No schema
+  changes found" = in sync); `supabase migration repair --status applied
+  <version>` fixes bookkeeping if needed.
+- If you prefer explicit schema control instead, disable auto-migration in
+  Dashboard → Project Settings → Integrations → GitHub — then `db push`
+  goes back to being the (only) path and the safety gate is human
+  discipline.
+
+## 5. First prod login
 
 Prefer "Entrar com Google" — it skips email deliverability entirely. Magic
 links still work but go through Supabase's rate-limited free SMTP. Either

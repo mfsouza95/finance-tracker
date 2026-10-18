@@ -142,7 +142,7 @@ Parked ideas to be designed together before any implementation. Both touch the m
 
 ## Operations notes
 
-- Production deploy steps are in `docs/DEPLOY.md`.
+- Production deploy steps are in `docs/DEPLOY.md`. Pushing to `main` auto-deploys frontend AND migrations (Supabase GitHub integration), so **schema changes (`supabase/migrations/`, `supabase/tests/`) always ride a branch + PR** — CI runs pgTAP before merge; everything else may go straight to `main`. Manual `db push` is for bootstrap/drift only.
 - Supabase free projects pause after 7 days of inactivity: `.github/workflows/keepalive.yml` pings the prod project every 3 days (needs `SUPABASE_URL` + `SUPABASE_PUBLISHABLE_KEY` secrets).
 - Free tier has no automatic backups: `.github/workflows/backup.yml` dumps weekly to a workflow artifact (needs `SUPABASE_DB_URL`); test a restore once.
 - Free-tier terms change; re-check pricing pages before relying on them.
