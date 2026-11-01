@@ -4,7 +4,10 @@ name: Keepalive
 # authenticated API call every few days keeps the project alive.
 on:
   schedule:
-    - cron: '0 12 */3 * *'
+    # Twice daily × 3 table queries ≈ 6 real DB requests/day. Supabase's
+    # pause detector wants "a few user requests to the database each day"
+    # over the week — a single ping every 3 days is below that bar.
+    - cron: '0 6,18 * * *'
   workflow_dispatch:
 
 jobs:
@@ -24,14 +27,19 @@ jobs:
             echo "::error::SUPABASE_PUBLISHABLE_KEY secret is missing or empty"
             exit 1
           fi
-          # Query a real table: the /rest/v1/ root spec endpoint rejects
-          # publishable keys, but RLS-scoped table reads return 200.
-          code=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
-            -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" \
-            "${SUPABASE_URL%/}/rest/v1/profiles?select=user_id&limit=1")
-          echo "HTTP $code"
-          case "$code" in
-            2*) ;;
-            *) echo "::error::Ping failed with HTTP $code"; exit 1 ;;
-          esac
+          # Query real tables: the /rest/v1/ root spec endpoint rejects
+          # publishable keys, but RLS-scoped table reads return 200 and
+          # every one reaches Postgres (RLS is evaluated inside the DB).
+          # A gateway-answered response (e.g. /auth/v1/health) would return
+          # 200 without counting as database activity.
+          for table in profiles months categories; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" \
+              -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+              -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" \
+              "${SUPABASE_URL%/}/rest/v1/${table}?select=user_id&limit=1")
+            echo "GET ${table}: HTTP $code"
+            case "$code" in
+              2*) ;;
+              *) echo "::error::Ping failed on ${table} with HTTP $code"; exit 1 ;;
+            esac
+          done
