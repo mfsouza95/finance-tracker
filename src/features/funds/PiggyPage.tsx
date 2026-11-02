@@ -3,8 +3,6 @@ import { Check, Undo2 } from 'lucide-react'
 import { EmptyState } from '@/components/EmptyState'
 import { Money } from '@/components/Money'
 import { Button } from '@/components/ui/button'
-import { useMonth } from '@/features/months/hooks'
-import { useSelectedMonth } from '@/features/months/selectedMonth'
 
 import type { Fund } from './hooks'
 import {
@@ -20,8 +18,6 @@ import { DepositDialog } from './DepositDialog'
 // buckets, mark achieved, delete (optionally rescuing the balance into
 // extras). The dashboard only shows a compact summary.
 export function PiggyPage() {
-  const { ym } = useSelectedMonth()
-  const { data: month } = useMonth(ym.year, ym.month)
   const { data: piggies, isLoading } = useFunds('piggy')
   const { data: balances } = useFundBalances()
 
@@ -51,7 +47,6 @@ export function PiggyPage() {
               key={p.id}
               fund={p}
               saved={balances?.[p.id] ?? 0}
-              month={month}
             />
           ))}
         </ul>
@@ -77,15 +72,7 @@ export function PiggyPage() {
   )
 }
 
-function PiggyRow({
-  fund,
-  saved,
-  month,
-}: {
-  fund: Fund
-  saved: number
-  month: ReturnType<typeof useMonth>['data']
-}) {
+function PiggyRow({ fund, saved }: { fund: Fund; saved: number }) {
   const update = useUpdateFund()
   const goal = fund.goal_cents ?? 0
   const pct = goal > 0 ? Math.min(100, (saved / goal) * 100) : 0
@@ -97,7 +84,7 @@ function PiggyRow({
         <span className="text-sm text-muted-foreground">
           <Money cents={saved} size="sm" /> de <Money cents={goal} size="sm" />
         </span>
-        {month && <DepositDialog fund={fund} month={month} />}
+        <DepositDialog fund={fund} />
         <Button
           variant="ghost"
           size="icon-sm"

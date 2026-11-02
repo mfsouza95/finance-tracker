@@ -16,7 +16,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { parseBrlToCents } from '@/lib/money'
 import { useSession } from '@/features/auth/useSession'
-import type { Month } from '@/features/months/hooks'
 
 import type { Fund } from './hooks'
 import {
@@ -34,7 +33,7 @@ import { DepositDialog } from './DepositDialog'
 // delete. Completed banks live in the month history and deletion-flagged
 // ones in the Excluídas section on /reservas — both are excluded here.
 // Active banks show up as "categories" when logging entries.
-export function BanksPanel({ month }: { month: Month }) {
+export function BanksPanel() {
   const { data: banks, isLoading } = useFunds('bank')
   const { data: balances } = useFundBalances()
   const { data: spendCounts } = useFundSpendCounts()
@@ -68,7 +67,6 @@ export function BanksPanel({ month }: { month: Month }) {
               fund={b}
               balance={balances?.[b.id] ?? 0}
               hasSpends={(spendCounts?.[b.id] ?? 0) > 0}
-              month={month}
             />
           ))}
         </ul>
@@ -81,12 +79,10 @@ export function BankRow({
   fund,
   balance,
   hasSpends,
-  month,
 }: {
   fund: Fund
   balance: number
   hasSpends: boolean
-  month: Month | null | undefined
 }) {
   const update = useUpdateFund()
 
@@ -112,7 +108,7 @@ export function BankRow({
       </button>
       <span className="flex-1 truncate text-sm font-medium">{fund.name}</span>
       <Money cents={balance} size="sm" />
-      {month && <DepositDialog fund={fund} month={month} />}
+      <DepositDialog fund={fund} />
       <CompleteFundDialog fund={fund} balance={balance} />
       <DeleteFundDialog fund={fund} balance={balance} hasSpends={hasSpends} />
     </li>

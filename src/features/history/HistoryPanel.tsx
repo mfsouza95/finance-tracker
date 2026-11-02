@@ -4,7 +4,7 @@ import { EmptyState } from '@/components/EmptyState'
 import { Money } from '@/components/Money'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { monthLabel } from '@/lib/dates'
+import { formatISODateShort, monthLabel } from '@/lib/dates'
 import { FundHistoryRow } from '@/features/funds/FundHistoryRow'
 import { useFunds, useReopenFund, type Fund } from '@/features/funds/hooks'
 
@@ -94,6 +94,12 @@ export function HistoryPanel() {
               <div className="flex items-baseline justify-between">
                 <span className="text-sm font-medium capitalize">
                   {monthLabel(s.months.year, s.months.month)}
+                  {s.months.closes_on && (
+                    <span className="text-muted-foreground font-normal normal-case">
+                      {' '}
+                      · fatura {formatISODateShort(s.months.closes_on)}
+                    </span>
+                  )}
                 </span>
                 <span className="text-muted-foreground text-xs">
                   líquido <Money cents={s.net_income_cents} size="sm" />

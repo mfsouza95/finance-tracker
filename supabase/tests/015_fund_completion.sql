@@ -62,7 +62,7 @@ select public.close_month(
 select throws_ok(
   $$ select public.complete_fund(
        'fa500000-0000-0000-0000-00000000000d', false) $$,
-  'open the current month to complete a reserve with balance');
+  'no open month to complete a reserve with balance');
 
 -- A zero-balance bank completes fine even without an open month.
 select public.complete_fund('fa500000-0000-0000-0000-00000000000c', false);

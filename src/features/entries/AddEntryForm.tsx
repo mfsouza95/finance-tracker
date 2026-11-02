@@ -30,7 +30,9 @@ export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
   const addEntry = useAddEntry()
   const { data: banks } = useFunds('bank')
 
-  const monthPrefix = `${month.year}-${String(month.month).padStart(2, '0')}`
+  // Dates are free-form on purpose: the month is a labelled budget bucket,
+  // and any paid_on can be recorded into it (fatura months don't track the
+  // calendar).
   const schema = z.object({
     categoryId: z.string().min(1, 'Escolha um pote ou categoria'),
     amount: z
@@ -42,12 +44,7 @@ export function AddEntryForm({ month, categories, onDone }: AddEntryFormProps) {
         },
         { message: 'Informe um valor válido (ex.: 25,90)' },
       ),
-    paidOn: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Informe uma data')
-      .refine((d) => d.startsWith(monthPrefix), {
-        message: 'A data precisa ser dentro do mês',
-      }),
+    paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Informe uma data'),
     note: z.string(),
   })
   type FormData = z.infer<typeof schema>

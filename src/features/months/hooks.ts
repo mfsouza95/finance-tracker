@@ -21,6 +21,27 @@ export function useMonth(year: number, month: number) {
   })
 }
 
+// The canonical write-target for money movements: the newest open month by
+// label (max year, month) — deposits and fund drains always charge it, no
+// matter which month is on screen.
+export function useLatestOpenMonth() {
+  return useQuery({
+    queryKey: ['months', 'latest-open'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('months')
+        .select('*')
+        .eq('status', 'open')
+        .order('year', { ascending: false })
+        .order('month', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (error) throw error
+      return data
+    },
+  })
+}
+
 export function useOpenMonth() {
   const qc = useQueryClient()
   return useMutation({
@@ -28,11 +49,15 @@ export function useOpenMonth() {
       year: number
       month: number
       netIncomeCents: number
+      closesOn?: string
+      paydayOn?: string
     }) => {
       const { data, error } = await supabase.rpc('open_month', {
         year: vars.year,
         month: vars.month,
         net_income_cents: vars.netIncomeCents,
+        closes_on: vars.closesOn,
+        payday_on: vars.paydayOn,
       })
       if (error) throw error
       return data

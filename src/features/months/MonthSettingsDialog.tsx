@@ -26,6 +26,8 @@ export function MonthSettingsDialog({ month }: { month: Month }) {
     fun: String(month.fun_pct),
     invest: String(month.invest_pct),
   })
+  const [closesOn, setClosesOn] = useState(month.closes_on ?? '')
+  const [paydayOn, setPaydayOn] = useState(month.payday_on ?? '')
   const [error, setError] = useState<string | null>(null)
 
   const applyPreset = (key: keyof typeof SPLIT_PRESETS) => {
@@ -63,6 +65,8 @@ export function MonthSettingsDialog({ month }: { month: Month }) {
           essential_pct: e,
           fun_pct: f,
           invest_pct: i,
+          closes_on: closesOn || null,
+          payday_on: paydayOn || null,
         },
       },
       {
@@ -138,6 +142,31 @@ export function MonthSettingsDialog({ month }: { month: Month }) {
                 />
               </div>
             ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="closes-on" className="text-sm font-medium">
+                Fechamento da fatura
+              </label>
+              <Input
+                id="closes-on"
+                type="date"
+                value={closesOn}
+                onChange={(e) => setClosesOn(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="payday-on" className="text-sm font-medium">
+                Dia do pagamento
+              </label>
+              <Input
+                id="payday-on"
+                type="date"
+                value={paydayOn}
+                onChange={(e) => setPaydayOn(e.target.value)}
+              />
+            </div>
           </div>
 
           {error && (

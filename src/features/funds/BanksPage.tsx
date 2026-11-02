@@ -4,8 +4,6 @@ import { EmptyState } from '@/components/EmptyState'
 import { Money } from '@/components/Money'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { useMonth } from '@/features/months/hooks'
-import { useSelectedMonth } from '@/features/months/selectedMonth'
 
 import type { Fund } from './hooks'
 import {
@@ -22,8 +20,6 @@ import { FundHistoryRow } from './FundHistoryRow'
 // deletion-flagged ones wait here in Excluídas until the month closes —
 // recoverable with the restore button.
 export function BanksPage() {
-  const { ym } = useSelectedMonth()
-  const { data: month } = useMonth(ym.year, ym.month)
   const { data: banks, isLoading } = useFunds('bank')
   const { data: balances } = useFundBalances()
   const { data: spendCounts } = useFundSpendCounts()
@@ -59,7 +55,6 @@ export function BanksPage() {
                 fund={b}
                 balance={balances?.[b.id] ?? 0}
                 hasSpends={(spendCounts?.[b.id] ?? 0) > 0}
-                month={month}
               />
             ))}
           </ul>
@@ -72,8 +67,9 @@ export function BanksPage() {
             Excluídas
           </h2>
           <p className="text-muted-foreground text-xs">
-            Serão excluídas permanentemente quando o mês atual fechar — o
-            saldo restante vai para os extras daquele mês.
+            Serão excluídas permanentemente quando o mês em que foram
+            marcadas fechar — o saldo restante vai para os extras daquele
+            mês.
           </p>
           <div className="flex flex-col">
             {deleted.map((b) => (

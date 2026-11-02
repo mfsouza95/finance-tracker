@@ -11,34 +11,33 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { todayInMonthISO } from '@/lib/dates'
+import { monthLabel, todayInMonthISO } from '@/lib/dates'
 import { parseBrlToCents } from '@/lib/money'
-import type { Month } from '@/features/months/hooks'
+import { useLatestOpenMonth } from '@/features/months/hooks'
 
 import type { Fund } from './hooks'
 import { useDepositToFund } from './hooks'
 
 // Deposit money into a fund: each nonzero bucket amount becomes an entry
-// in that bucket (charged at deposit time) and credits the fund. Fill one
-// bucket or both for a split.
-export function DepositDialog({
-  fund,
-  month,
-}: {
-  fund: Fund
-  month: Month
-}) {
+// in that bucket (charged at deposit time) and credits the fund. Deposits
+// are a money movement — they always charge the LATEST open month, not the
+// one on screen, and the dialog names that target.
+export function DepositDialog({ fund }: { fund: Fund }) {
+  const { data: month } = useLatestOpenMonth()
   const [open, setOpen] = useState(false)
   const [essential, setEssential] = useState('')
   const [fun, setFun] = useState('')
   const [note, setNote] = useState('')
-  const [paidOn, setPaidOn] = useState(() =>
-    todayInMonthISO(month.year, month.month),
-  )
+  // null = untouched, shows the default (today clamped to the target month);
+  // follows the latest open month automatically.
+  const [paidOnInput, setPaidOnInput] = useState<string | null>(null)
+  const paidOn =
+    paidOnInput ?? (month ? todayInMonthISO(month.year, month.month) : '')
   const [error, setError] = useState<string | null>(null)
   const deposit = useDepositToFund()
 
   const submit = () => {
+    if (!month) return
     const e = essential.trim() === '' ? 0 : parseBrlToCents(essential)
     const f = fun.trim() === '' ? 0 : parseBrlToCents(fun)
     if (e === null || f === null || e < 0 || f < 0) {
@@ -56,7 +55,7 @@ export function DepositDialog({
         monthId: month.id,
         essentialCents: e,
         funCents: f,
-        paidOn,
+        paidOn: paidOn || undefined,
         note: note.trim() || undefined,
       },
       {
@@ -64,6 +63,7 @@ export function DepositDialog({
           setEssential('')
           setFun('')
           setNote('')
+          setPaidOnInput(null)
           setOpen(false)
         },
         onError: (err) => setError(err.message),
@@ -78,7 +78,7 @@ export function DepositDialog({
           variant="ghost"
           size="icon-sm"
           aria-label={`Depositar em ${fund.name}`}
-          disabled={month.status !== 'open'}
+          disabled={!month}
         >
           <Plus className="size-3.5" />
         </Button>
@@ -87,7 +87,9 @@ export function DepositDialog({
         <DialogHeader>
           <DialogTitle>Depositar em {fund.name}</DialogTitle>
           <DialogDescription>
-            O valor sai do(s) pote(s) escolhido(s) e vai para {fund.name}.
+            {month
+              ? `O valor sai dos potes de ${monthLabel(month.year, month.month)} e vai para ${fund.name}.`
+              : 'Abra um mês para depositar.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -127,7 +129,7 @@ export function DepositDialog({
               id="dep-date"
               type="date"
               value={paidOn}
-              onChange={(e) => setPaidOn(e.target.value)}
+              onChange={(e) => setPaidOnInput(e.target.value)}
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -149,7 +151,7 @@ export function DepositDialog({
             {error}
           </p>
         )}
-        <Button onClick={submit} disabled={deposit.isPending}>
+        <Button onClick={submit} disabled={deposit.isPending || !month}>
           {deposit.isPending ? 'Depositando…' : 'Depositar'}
         </Button>
       </DialogContent>

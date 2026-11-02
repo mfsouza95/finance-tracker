@@ -107,16 +107,22 @@ isOneToOne: false
                   ]
                 },"funds": {
                   Row: {
-                    "achieved_at": string | null,"active": boolean,"completed_at": string | null,"created_at": string,"deleted_at": string | null,"goal_cents": number | null,"id": string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
+                    "achieved_at": string | null,"active": boolean,"completed_at": string | null,"created_at": string,"deleted_at": string | null,"deleted_in_month_id": string | null,"goal_cents": number | null,"id": string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
                   }
                   Insert: {
-                    "achieved_at"?: string | null,"active"?: boolean,"completed_at"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"goal_cents"?: number | null,"id"?: string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
+                    "achieved_at"?: string | null,"active"?: boolean,"completed_at"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"deleted_in_month_id"?: string | null,"goal_cents"?: number | null,"id"?: string,"kind": Database["public"]['Enums']["fund_kind"],"name": string,"user_id": string
                   }
                   Update: {
-                    "achieved_at"?: string | null,"active"?: boolean,"completed_at"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"goal_cents"?: number | null,"id"?: string,"kind"?: Database["public"]['Enums']["fund_kind"],"name"?: string,"user_id"?: string
+                    "achieved_at"?: string | null,"active"?: boolean,"completed_at"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"deleted_in_month_id"?: string | null,"goal_cents"?: number | null,"id"?: string,"kind"?: Database["public"]['Enums']["fund_kind"],"name"?: string,"user_id"?: string
                   }
                   Relationships: [
-                    
+                    {
+      foreignKeyName: "funds_deleted_in_month_id_fkey"
+      columns: ["deleted_in_month_id"]
+isOneToOne: false
+      referencedRelation: "months"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"month_summaries": {
                   Row: {
@@ -139,13 +145,13 @@ isOneToOne: false
                   ]
                 },"months": {
                   Row: {
-                    "closed_at": string | null,"created_at": string,"essential_pct": number,"fun_pct": number,"id": string,"invest_pct": number,"invested_cents": number | null,"month": number,"net_income_cents": number,"status": Database["public"]['Enums']["month_status"],"user_id": string,"year": number
+                    "closed_at": string | null,"closes_on": string | null,"created_at": string,"essential_pct": number,"fun_pct": number,"id": string,"invest_pct": number,"invested_cents": number | null,"month": number,"net_income_cents": number,"payday_on": string | null,"status": Database["public"]['Enums']["month_status"],"user_id": string,"year": number
                   }
                   Insert: {
-                    "closed_at"?: string | null,"created_at"?: string,"essential_pct": number,"fun_pct": number,"id"?: string,"invest_pct": number,"invested_cents"?: number | null,"month": number,"net_income_cents": number,"status"?: Database["public"]['Enums']["month_status"],"user_id": string,"year": number
+                    "closed_at"?: string | null,"closes_on"?: string | null,"created_at"?: string,"essential_pct": number,"fun_pct": number,"id"?: string,"invest_pct": number,"invested_cents"?: number | null,"month": number,"net_income_cents": number,"payday_on"?: string | null,"status"?: Database["public"]['Enums']["month_status"],"user_id": string,"year": number
                   }
                   Update: {
-                    "closed_at"?: string | null,"created_at"?: string,"essential_pct"?: number,"fun_pct"?: number,"id"?: string,"invest_pct"?: number,"invested_cents"?: number | null,"month"?: number,"net_income_cents"?: number,"status"?: Database["public"]['Enums']["month_status"],"user_id"?: string,"year"?: number
+                    "closed_at"?: string | null,"closes_on"?: string | null,"created_at"?: string,"essential_pct"?: number,"fun_pct"?: number,"id"?: string,"invest_pct"?: number,"invested_cents"?: number | null,"month"?: number,"net_income_cents"?: number,"payday_on"?: string | null,"status"?: Database["public"]['Enums']["month_status"],"user_id"?: string,"year"?: number
                   }
                   Relationships: [
                     
@@ -248,8 +254,9 @@ isOneToOne: false
 { Args: { "p_essential_cents"?: number,"p_fun_cents"?: number,"p_fund_id": string,"p_month_id": string,"p_note"?: string,"p_paid_on"?: string }; Returns: undefined
                            },
 "open_month":
-{ Args: { "month": number,"net_income_cents": number,"year": number }; Returns: {
+{ Args: { "closes_on"?: string,"month": number,"net_income_cents": number,"payday_on"?: string,"year": number }; Returns: {
               "closed_at": string | null,
+"closes_on": string | null,
 "created_at": string,
 "essential_pct": number,
 "fun_pct": number,
@@ -258,6 +265,7 @@ isOneToOne: false
 "invested_cents": number | null,
 "month": number,
 "net_income_cents": number,
+"payday_on": string | null,
 "status": Database["public"]['Enums']["month_status"],
 "user_id": string,
 "year": number
@@ -274,6 +282,7 @@ isOneToOne: false
 "reopen_month":
 { Args: { "month_id": string }; Returns: {
               "closed_at": string | null,
+"closes_on": string | null,
 "created_at": string,
 "essential_pct": number,
 "fun_pct": number,
@@ -282,6 +291,7 @@ isOneToOne: false
 "invested_cents": number | null,
 "month": number,
 "net_income_cents": number,
+"payday_on": string | null,
 "status": Database["public"]['Enums']["month_status"],
 "user_id": string,
 "year": number
