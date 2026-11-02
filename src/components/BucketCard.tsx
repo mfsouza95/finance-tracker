@@ -42,7 +42,7 @@ export function BucketCard({
         <h2 className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
           {title}
         </h2>
-        <Money cents={rest} size="xl" sign="sign" />
+        <Money cents={rest} size="xl" sign="sign" className="pod-metric" />
       </header>
 
       <div
@@ -80,7 +80,7 @@ export function BucketCard({
       </div>
 
       {children && (
-        <div className="mt-3 flex-1 border-t border-border pt-1">
+        <div className="mt-3 min-h-0 flex-1 overflow-y-auto border-t border-border pt-1">
           {children}
         </div>
       )}

@@ -156,6 +156,25 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"pace_snapshots": {
+                  Row: {
+                    "allowance_cents": number,"computed_at": string,"kind": string,"month_id": string,"period_start": string,"scope": string,"user_id": string
+                  }
+                  Insert: {
+                    "allowance_cents": number,"computed_at"?: string,"kind": string,"month_id": string,"period_start": string,"scope": string,"user_id": string
+                  }
+                  Update: {
+                    "allowance_cents"?: number,"computed_at"?: string,"kind"?: string,"month_id"?: string,"period_start"?: string,"scope"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "pace_snapshots_user_id_month_id_fkey"
+      columns: ["user_id","month_id"]
+isOneToOne: false
+      referencedRelation: "months"
+      referencedColumns: ["user_id","id"]
+    }
+                  ]
                 },"profiles": {
                   Row: {
                     "created_at": string,"display_name": string | null,"user_id": string
