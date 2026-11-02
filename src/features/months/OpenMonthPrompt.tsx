@@ -16,6 +16,8 @@ export function OpenMonthPrompt() {
   const { ym, navigate } = useSelectedMonth()
   const { year, month } = ym
   const [net, setNet] = useState('')
+  const [closesOn, setClosesOn] = useState('')
+  const [paydayOn, setPaydayOn] = useState('')
   const [error, setError] = useState<string | null>(null)
   const openMonth = useOpenMonth()
   const current = currentYearMonth()
@@ -31,7 +33,13 @@ export function OpenMonthPrompt() {
     }
     setError(null)
     openMonth.mutate(
-      { year, month, netIncomeCents: cents },
+      {
+        year,
+        month,
+        netIncomeCents: cents,
+        closesOn: closesOn || undefined,
+        paydayOn: paydayOn || undefined,
+      },
       { onError: (e) => setError(e.message) },
     )
   }
@@ -64,6 +72,34 @@ export function OpenMonthPrompt() {
             onChange={(e) => setNet(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && submit()}
           />
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="closes-on" className="text-sm font-medium">
+                Fechamento da fatura
+              </label>
+              <Input
+                id="closes-on"
+                type="date"
+                value={closesOn}
+                onChange={(e) => setClosesOn(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="payday-on" className="text-sm font-medium">
+                Dia do pagamento
+              </label>
+              <Input
+                id="payday-on"
+                type="date"
+                value={paydayOn}
+                onChange={(e) => setPaydayOn(e.target.value)}
+              />
+            </div>
+          </div>
+          <p className="text-muted-foreground text-xs">
+            Opcionais — a fatura só gera um aviso perto do prazo, sem forçar o
+            fechamento.
+          </p>
           {error && (
             <div className="flex flex-col gap-2">
               <p role="alert" className="text-negative text-sm">

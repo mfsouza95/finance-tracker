@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Money } from '@/components/Money'
+import { formatISODateShort } from '@/lib/dates'
 import {
   computeBuckets,
   expectedInvestment,
@@ -52,6 +53,17 @@ export function MonthSummary({ month }: { month: Month }) {
           {isOpen ? 'Aberto' : 'Fechado'}
         </Badge>
       </header>
+
+      {(month.closes_on || month.payday_on) && (
+        <p className="mt-1 text-muted-foreground text-xs">
+          {[
+            month.closes_on && `fatura ${formatISODateShort(month.closes_on)}`,
+            month.payday_on && `salário ${formatISODateShort(month.payday_on)}`,
+          ]
+            .filter(Boolean)
+            .join(' · ')}
+        </p>
+      )}
 
       <p className="mt-3 text-sm text-muted-foreground">Restante do mês</p>
       <Money

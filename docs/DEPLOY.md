@@ -94,7 +94,7 @@ Repo → Settings → Secrets and variables → Actions:
 | --- | --- |
 | `SUPABASE_URL` | `https://<ref>.supabase.co` |
 | `SUPABASE_PUBLISHABLE_KEY` | publishable key |
-| `SUPABASE_DB_URL` | Dashboard **Connect** button → "Session pooler" URI: `postgresql://postgres.<ref>:<db-password>@aws-0-<region>.pooler.supabase.com:5432/postgres` — use the pooler (GitHub runners have no IPv6 for a direct connection) and session mode specifically (port 5432, not the transaction pooler on 6543). |
+| `SUPABASE_DB_URL` | Dashboard **Connect** button → "Session pooler" URI: `postgresql://postgres.<ref>:<db-password>@aws-0-<region>.pooler.supabase.com:5432/postgres` — use the pooler (GitHub runners have no IPv6 for a direct `db.<ref>` connection) and session mode specifically (port 5432, not the transaction pooler on 6543 — pg_dump needs a session). If the DB password contains URL-reserved characters (`@ # % & / + = : ?`), percent-encode it (`@`→`%40`, `#`→`%23`, `%`→`%25`, `&`→`%26`, `+`→`%2B`, `/`→`%2F`, `:`→`%3A`, `?`→`%3F`, `=`→`%3D`) or the dump fails with `failed to parse connection string`. |
 
 - **Keepalive** pings the REST endpoint every 3 days so the free project does
   not pause. Without it, the project pauses after ~7 idle days and auth/API

@@ -29,12 +29,10 @@ set "request.jwt.claim.sub" = 'b3b3b3b3-0000-0000-0000-00000000000a';
 set "request.jwt.claims" =
   '{"sub":"b3b3b3b3-0000-0000-0000-00000000000a","role":"authenticated"}';
 
--- U: month 2026-08 (net 10000 → 5000/3000/2000) + current month open so
--- delete_fund has somewhere to send extras.
+-- U: month 2026-08 (net 10000 → 5000/3000/2000). Deposits only target the
+-- latest open month, so the current month opens later — once 2026-08 is
+-- closed — to anchor the deletion and receive the extras.
 select public.open_month(2026::smallint, 8::smallint, 1000000);
-select public.open_month(
-  extract(year from current_date)::smallint,
-  extract(month from current_date)::smallint, 500000);
 
 select lives_ok(
   $$ insert into public.funds (user_id, kind, name, goal_cents) values
@@ -157,9 +155,13 @@ select is(
 
 -- ----------------------------------------------------------------
 -- delete_fund on a bank WITH spend history only flags it (soft delete):
--- balance stays parked until the current month closes, when close_month
--- purges the row and lands the 35000 in that month's extra_income.
+-- the flag anchors to the latest open month, and close_month purges the
+-- row when THAT month closes, landing the 35000 in its extra_income.
 -- ----------------------------------------------------------------
+select public.open_month(
+  extract(year from current_date)::smallint,
+  extract(month from current_date)::smallint, 500000);
+
 select public.delete_fund(
   (select id from public.funds where name = 'Viagem'), true);
 

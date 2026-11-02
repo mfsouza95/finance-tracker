@@ -43,6 +43,21 @@ export function monthLabel(year: number, month: number): string {
   return `${MONTH_NAMES[month - 1]} de ${year}`
 }
 
+// 'YYYY-MM-DD' -> 'DD/MM' (for compact date labels like "fatura 03/11").
+export function formatISODateShort(iso: string): string {
+  const [, m, d] = iso.split('-')
+  return `${d}/${m}`
+}
+
+// Whole calendar days from today until 'YYYY-MM-DD' (negative = past),
+// computed on date parts so DST/timezone never shifts the count.
+export function daysUntilISO(iso: string, now = new Date()): number {
+  const [y, m, d] = iso.split('-').map(Number)
+  const target = Date.UTC(y, m - 1, d)
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
+  return Math.round((target - today) / 86_400_000)
+}
+
 // 'YYYY-MM-DD' -> 'DD/MM/YYYY' without timezone surprises.
 export function formatISODate(iso: string): string {
   const [y, m, d] = iso.split('-')

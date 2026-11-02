@@ -47,7 +47,7 @@ export function Dashboard() {
         <BucketPanel month={month} bucket="fun" title="Lazer" />
       </div>
       <div className="grid grid-cols-1 items-stretch gap-4 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
-        <BanksPanel month={month} />
+        <BanksPanel />
         <PiggySummaryCard />
       </div>
     </div>

@@ -91,16 +91,10 @@ function AddExtraForm({ month }: { month: Month }) {
   )
   const [error, setError] = useState<string | null>(null)
 
-  const monthPrefix = `${month.year}-${String(month.month).padStart(2, '0')}`
-
   const submit = () => {
     const cents = parseBrlToCents(amount)
     if (cents === null || cents <= 0) {
       setError('Informe um valor válido (ex.: 250,00)')
-      return
-    }
-    if (!receivedOn.startsWith(monthPrefix)) {
-      setError('A data precisa ser dentro do mês')
       return
     }
     if (!session) return

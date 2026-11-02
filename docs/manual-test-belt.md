@@ -18,6 +18,7 @@ runs with `supabase db reset` if you want a clean slate.
 - [ ] Fresh user sees "Abrir {mês}" prompt
 - [ ] Net income rejects junk: `abc`, `12,345`, empty
 - [ ] Accepts `5000` and `5.000,00` equally → month opens, buckets = 50/30/20 of net
+- [ ] Open with "Fechamento da fatura" and "Dia do pagamento" filled → Summary card shows "fatura DD/MM · salário DD/MM"
 - [ ] Summary shows: Renda líquida, Total para gastar (net − invest), Investimento previsto, Restante = total para gastar
 
 ## 3. Categories
@@ -32,7 +33,7 @@ runs with `supabase db reset` if you want a clean slate.
 
 - [ ] "Lançar gasto" opens the sheet; empty category / bad amount rejected with messages
 - [ ] Amount formats work: `25,90`, `25.90`, `1.250`, `1.250,00`
-- [ ] Date outside the current month → rejected
+- [ ] Date outside the viewed month → accepted (months are labelled buckets; any date can be recorded into them)
 - [ ] Entry appears under its category; count and sum update; bucket card Gasto/Restante update; summary Restante drops
 - [ ] Overspend a bucket → Restante goes negative, progress bar red
 - [ ] Expand a category → each entry listed; delete one → totals update
@@ -44,6 +45,7 @@ runs with `supabase db reset` if you want a clean slate.
 - [ ] Apply a preset (e.g. 55/25/20) → buckets recompute
 - [ ] Custom pcts that sum to ≠100 → "Os percentuais precisam somar 100", nothing saved
 - [ ] pct > 100 or non-integer → rejected
+- [ ] Edit "Fechamento da fatura" / "Dia do pagamento" → Summary card updates; clear one → its label disappears
 
 ## 6. Close month
 
@@ -69,6 +71,16 @@ runs with `supabase db reset` if you want a clean slate.
 
 - [ ] `pnpm supabase db reset` while signed in → open-month attempt shows the error with a hint and a Sair button
 - [ ] Sair → sign in again → fresh account bootstraps (profile + settings recreated by trigger)
+
+## 7c. Two open months, deposits & fatura deadline
+
+- [ ] With a month open, open the NEXT month too → both open at once
+- [ ] Depositar while VIEWING the older month → dialog says "O valor sai dos potes de {mês mais novo}" and the entries land there anyway
+- [ ] Deposit with a date outside the target month's calendar (e.g. last month) → accepted, entry shows that date
+- [ ] Set the latest open month's fatura to 10+ days out → no snackbar; 10 days → yellow "a fatura fecha em X dias"; 5 → orange; ≤3 or today → red; yesterday → red "fechou há 1 dia — feche quando quiser"
+- [ ] Snackbar X dismisses it; reload the app → it comes back
+- [ ] Banner only tracks the LATEST open month — an older open month's closes_on never triggers it
+- [ ] Flag a bank for deletion while two months are open → close the OLDER month → bank stays in Excluídas; close the newer (anchor) month → purged, balance in that month's extras
 
 ## 8. Multi-user (optional, second browser/incognito)
 
@@ -109,7 +121,7 @@ runs with `supabase db reset` if you want a clean slate.
 - [ ] Delete a bank with NO spends → erased for real; with balance the dialog offers extras-or-discard plus "Mudei de ideia, não excluir" (just cancels)
 - [ ] Delete a bank WITH spends → dialog warns it only goes when the month closes; bank moves to Excluídas on /reservas with its balance and a Recuperar button
 - [ ] Recuperar a flagged bank → returns to the live list, active, balance intact
-- [ ] Close the current month with a flagged bank → bank gone forever, remaining balance appears in Extras (and in the summary's extra_income_cents)
-- [ ] Close a non-current month (e.g. next month) → flagged banks untouched
+- [ ] Close the flagged bank's anchor month (the latest open one when it was marked) → bank gone forever, remaining balance appears in Extras (and in the summary's extra_income_cents)
+- [ ] Close a different month than the anchor → flagged banks untouched
 - [ ] /cofrinhos → Novo: name + goal required; progress bar fills as deposits land; ✓ moves it to Concluídos (undo brings it back); delete offers the same extras transfer
 - [ ] Deposit and entries on a closed month are rejected (read-only still holds)

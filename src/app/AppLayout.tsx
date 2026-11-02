@@ -15,6 +15,7 @@ import {
 import { signOut } from '@/features/auth/useSession'
 import { useCategories } from '@/features/categories/hooks'
 import { AddEntryForm } from '@/features/entries/AddEntryForm'
+import { DeadlineBanner } from '@/features/months/DeadlineBanner'
 import { useMonth } from '@/features/months/hooks'
 import { MonthNav } from '@/features/months/MonthNav'
 import { useSelectedMonth } from '@/features/months/selectedMonth'
@@ -93,6 +94,7 @@ export function AppLayout() {
       <main className="flex flex-1 flex-col p-4 sm:p-6">
         <Outlet />
       </main>
+      <DeadlineBanner />
     </div>
   )
 }
