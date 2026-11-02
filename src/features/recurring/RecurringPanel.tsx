@@ -78,7 +78,7 @@ export function RecurringPanel() {
           description="Assinaturas e parcelas geram entradas automaticamente ao abrir o mês."
         />
       ) : (
-        <ul className="flex max-h-64 flex-col gap-2 overflow-y-auto pr-1">
+        <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-1">
           {templates.map((t) => {
             const idx = installmentIndexAt(t, current.year, current.month)
             return (

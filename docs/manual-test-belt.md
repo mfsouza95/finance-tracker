@@ -82,6 +82,18 @@ runs with `supabase db reset` if you want a clean slate.
 - [ ] Banner only tracks the LATEST open month — an older open month's closes_on never triggers it
 - [ ] Flag a bank for deletion while two months are open → close the OLDER month → bank stays in Excluídas; close the newer (anchor) month → purged, balance in that month's extras
 
+## 7d. Ritmo (pace pod)
+
+- [ ] Open a month → Ritmo card appears with the month label, Hoje and Esta semana figures
+- [ ] Month with no fatura date → allowance divides by days to the label month end; set "Fechamento da fatura" → next period (or Recalcular) uses it as the bound
+- [ ] Log entries → Hoje/Semana drop but the underlying allowance stays fixed for the day/week
+- [ ] Recalcular → both figures recompute from the CURRENT remaining budget (a busted limit can show negative immediately)
+- [ ] Spend past the daily figure → Hoje goes negative in red
+- [ ] Scope toggle Todos/Essencial/Lazer → each keeps its own fixed figures for the period
+- [ ] Fatura date in the past, month still open → Hoje shows the whole remaining budget (days left clamps to 1)
+- [ ] Two open months → pod follows the NEWER one; a same-date entry logged into the older month does NOT lower the pod's numbers
+- [ ] New day / new Monday → fresh figures derived automatically; reloading mid-period never changes the allowance, only the spent part
+
 ## 8. Multi-user (optional, second browser/incognito)
 
 - [ ] Sign in as a different email → sees the "Abrir mês" prompt, not your data

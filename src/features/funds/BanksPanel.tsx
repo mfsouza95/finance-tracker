@@ -60,7 +60,7 @@ export function BanksPanel() {
           description="Crie uma reserva para guardar dinheiro fora dos potes."
         />
       ) : (
-        <ul className="flex flex-col divide-y divide-border">
+        <ul className="flex min-h-0 flex-1 flex-col divide-y divide-border overflow-y-auto pr-1">
           {live.map((b) => (
             <BankRow
               key={b.id}

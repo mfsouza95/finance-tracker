@@ -70,10 +70,10 @@ export function MonthSummary({ month }: { month: Month }) {
         cents={toSpend - totalSpent}
         size="xl"
         sign="sign"
-        className="block"
+        className="block pod-metric"
       />
 
-      <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+      <dl className="mt-4 grid min-h-0 flex-1 grid-cols-2 gap-x-4 gap-y-2 overflow-y-auto pr-1 text-sm">
         <div>
           <dt className="text-muted-foreground text-xs">Renda líquida</dt>
           <dd>

@@ -3,6 +3,7 @@ import { BanksPanel } from '@/features/funds/BanksPanel'
 import { PiggySummaryCard } from '@/features/funds/PiggySummaryCard'
 import { RecurringPanel } from '@/features/recurring/RecurringPanel'
 import { OpenMonthPrompt } from '@/features/months/OpenMonthPrompt'
+import { PaceCard } from '@/features/pace/PaceCard'
 import { useMonth } from '@/features/months/hooks'
 import { useSelectedMonth } from '@/features/months/selectedMonth'
 
@@ -29,25 +30,35 @@ export function Dashboard() {
     return <OpenMonthPrompt />
   }
 
-  // Three visual bands: summary-ish cards (3 cols), the two spending
-  // buckets side by side (2 cols), then fund management (3 cols again).
-  // Each band collapses to 2/1 columns below 2xl/md respectively.
-  // The bucket band is flex-1 + auto-rows-fr: it absorbs whatever
-  // vertical space the other bands leave, so Essencial/Lazer dominate
-  // the screen.
+  // One 6-col grid (see .dash-grid in index.css): rows 1/3 hold three
+  // 2-col pods, the middle row holds two 3-col pods. Row heights follow
+  // --dash-mid; below 1500px the grid collapses to equal columns with
+  // auto heights. Pod order is fixed: Resumo, Ritmo, Reserva ativa /
+  // Essencial, Lazer / Reservas, Recorrentes, Cofrinhos.
   return (
-    <div className="flex flex-1 flex-col gap-4 sm:gap-6">
-      <div className="grid grid-cols-1 items-stretch gap-4 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
+    <div className="dash-grid flex-1">
+      <div className="dash-pod">
         <MonthSummary month={month} />
-        <RecurringPanel />
+      </div>
+      <div className="dash-pod">
+        <PaceCard />
+      </div>
+      <div className="dash-pod">
         <ActiveBankCard month={month} />
       </div>
-      <div className="grid flex-auto auto-rows-fr grid-cols-1 items-stretch gap-4 sm:gap-6 md:grid-cols-2">
+      <div className="dash-pod dash-pod--wide">
         <BucketPanel month={month} bucket="essential" title="Essencial" />
+      </div>
+      <div className="dash-pod dash-pod--wide">
         <BucketPanel month={month} bucket="fun" title="Lazer" />
       </div>
-      <div className="grid grid-cols-1 items-stretch gap-4 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
+      <div className="dash-pod">
         <BanksPanel />
+      </div>
+      <div className="dash-pod">
+        <RecurringPanel />
+      </div>
+      <div className="dash-pod">
         <PiggySummaryCard />
       </div>
     </div>

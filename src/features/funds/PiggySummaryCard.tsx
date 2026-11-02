@@ -38,7 +38,7 @@ export function PiggySummaryCard() {
           description="Crie uma meta na página de cofrinhos."
         />
       ) : (
-        <ul className="flex flex-col gap-3">
+        <ul className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1">
           {open.map((p) => {
             const saved = balances?.[p.id] ?? 0
             const goal = p.goal_cents ?? 0

@@ -234,3 +234,57 @@
     display: none;
   }
 }
+
+/* Dashboard pods: a 3-2-3 layout on one 6-column grid so all rows share
+   the same outer edges. Outer pods span 2 cols; the middle row's span 3
+   (1.5x wider) and its row is --dash-mid times taller — the visual
+   priority. Below 1500px it collapses to equal columns with auto heights
+   (fixed-height logic off). Only two values tune the proportions:
+   --dash-rows (keep the middle <= ~1.4) and --dash-min-h. */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+.dash-pod {
+  min-width: 0;
+  min-height: 0;
+  container-type: inline-size;
+}
+.dash-pod > * {
+  height: 100%;
+  min-height: 0;
+}
+@media (min-width: 640px) {
+  .dash-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1500px) {
+  .dash-grid {
+    --dash-rows: 1fr 1.4fr 1fr;
+    --dash-min-h: 640px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-rows: var(--dash-rows);
+    min-height: var(--dash-min-h);
+  }
+  .dash-pod {
+    grid-column: span 2;
+    overflow: hidden;
+  }
+  .dash-pod--wide {
+    grid-column: span 3;
+  }
+  /* Pod internals scale with the pod (cqi = % of the pod's width), not
+     fixed pixels — clamped so they stay readable at 1536 and roomy at 2560. */
+  .dash-pod > * {
+    padding: clamp(0.75rem, 0.6rem + 0.8cqi, 1.25rem);
+  }
+  .dash-pod h2 {
+    font-size: clamp(0.75rem, 0.7rem + 0.3cqi, 0.9rem);
+  }
+  .pod-metric {
+    font-size: clamp(1.4rem, 1rem + 2.2cqi, 2.5rem);
+  }
+}
+

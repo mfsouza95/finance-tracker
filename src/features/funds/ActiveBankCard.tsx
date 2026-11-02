@@ -93,7 +93,7 @@ export function ActiveBankCard({ month }: { month: Month }) {
           </div>
 
           {spends.length > 0 && (
-            <ul className="mt-auto flex max-h-40 flex-col gap-1 overflow-y-auto border-t border-border pt-2 pr-1">
+            <ul className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto border-t border-border pt-2 pr-1">
               {spends.map((e) => (
                 <li
                   key={e.id}
