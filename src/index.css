@@ -261,14 +261,6 @@
   }
 }
 @media (min-width: 1500px) {
-  /* The grid's fr rows need a bounded height: main defaults to
-     min-height:auto so dense content would stretch it past the viewport
-     instead of letting pods clip. Scoped via :has so other pages keep
-     normal window scrolling; overflow-y keeps tiny screens scrollable. */
-  main:has(> .dash-grid) {
-    min-height: 0;
-    overflow-y: auto;
-  }
   .dash-grid {
     --dash-rows: 1fr 1.4fr 1fr;
     --dash-min-h: 640px;
