@@ -111,4 +111,21 @@ describe('scopeSpentCents / spentInWindow', () => {
     // window edges are inclusive
     expect(spentInWindow(entries, 'all', '2026-10-30', '2026-11-05')).toBe(1000)
   })
+  it('ignores fund deposits (fund_flow=in) but keeps them in month spent', () => {
+    const withDeposit = [
+      ...entries,
+      {
+        bucket: 'fun' as const,
+        amount_cents: 50_000,
+        paid_on: '2026-11-02',
+        fund_flow: 'in',
+      },
+    ]
+    // Deposits shrink the remaining budget via scopeSpentCents…
+    expect(scopeSpentCents(withDeposit, 'all')).toBe(51_000)
+    // …but never count as the period's spending — a piggy deposit must
+    // not bust today's figure.
+    expect(spentInWindow(withDeposit, 'all', '2026-11-02', '2026-11-02')).toBe(300)
+    expect(spentInWindow(withDeposit, 'fun', '2026-11-02', '2026-11-08')).toBe(500)
+  })
 })

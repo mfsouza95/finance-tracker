@@ -88,9 +88,17 @@ export function paceAllowance(remainingCents: number, periodsLeft: number): numb
 }
 
 // Sum of scope entries with paid_on inside [from, to] (inclusive, string
-// compare on ISO dates).
+// compare on ISO dates). Fund deposits (fund_flow='in') are NOT spending:
+// they already shrink the remaining budget via scopeSpentCents, which is
+// where the allowance absorbs them — counting them here too would bust a
+// period for what is really a transfer to savings.
 export function spentInWindow(
-  entries: { bucket: 'essential' | 'fun'; amount_cents: number; paid_on: string }[],
+  entries: {
+    bucket: 'essential' | 'fun'
+    amount_cents: number
+    paid_on: string
+    fund_flow?: string | null
+  }[],
   scope: PaceScope,
   from: string,
   to: string,
@@ -98,6 +106,7 @@ export function spentInWindow(
   let total = 0
   for (const e of entries) {
     if (scope !== 'all' && e.bucket !== scope) continue
+    if (e.fund_flow === 'in') continue
     if (e.paid_on >= from && e.paid_on <= to) total += e.amount_cents
   }
   return total

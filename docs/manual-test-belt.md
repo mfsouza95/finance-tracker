@@ -84,13 +84,14 @@ runs with `supabase db reset` if you want a clean slate.
 
 ## 7d. Ritmo (pace pod)
 
-- [ ] Open a month → Ritmo card appears with the month label, Hoje and Esta semana figures
+- [ ] Open a month → Ritmo card appears with the month label, Diário and Semanal figures, each with a usage bar
 - [ ] Month with no fatura date → allowance divides by days to the label month end; set "Fechamento da fatura" → next period (or Recalcular) uses it as the bound
-- [ ] Log entries → Hoje/Semana drop but the underlying allowance stays fixed for the day/week
-- [ ] Recalcular → both figures recompute from the CURRENT remaining budget (a busted limit can show negative immediately)
-- [ ] Spend past the daily figure → Hoje goes negative in red
-- [ ] Scope toggle Todos/Essencial/Lazer → each keeps its own fixed figures for the period
-- [ ] Fatura date in the past, month still open → Hoje shows the whole remaining budget (days left clamps to 1)
+- [ ] Log entries → the figures drop and the bars fill, but the underlying allowance stays fixed for the day/week
+- [ ] Recalcular → all figures recompute from the CURRENT remaining budget (a busted limit can show negative immediately)
+- [ ] Spend past the daily figure → Diário goes negative in red and its bar fills solid red
+- [ ] Caption line → per-bucket daily figures (Essencial hoje / Lazer hoje) update on their own
+- [ ] Piggy/bank deposit → does NOT bust the day's figure; the remaining budget shrinks so the next period (or Recalcular) shows a smaller allowance
+- [ ] Fatura date in the past, month still open → Diário shows the whole remaining budget (days left clamps to 1)
 - [ ] Two open months → pod follows the NEWER one; a same-date entry logged into the older month does NOT lower the pod's numbers
 - [ ] New day / new Monday → fresh figures derived automatically; reloading mid-period never changes the allowance, only the spent part
 
