@@ -3,9 +3,9 @@ import { RotateCcw } from 'lucide-react'
 
 import { EmptyState } from '@/components/EmptyState'
 import { Money } from '@/components/Money'
+import { ProgressBar } from '@/components/ProgressBar'
 import { Button } from '@/components/ui/button'
 import { monthLabel } from '@/lib/dates'
-import { cn } from '@/lib/utils'
 import { useEntries } from '@/features/entries/hooks'
 import { extrasTotal, useExtras } from '@/features/extras/hooks'
 import {
@@ -95,15 +95,15 @@ export function PaceCard({ viewedMonth }: { viewedMonth: Month }) {
               : `O ritmo é calculado sobre ${monthLabel(month.year, month.month)}.`
           }
           description="Volte para o mês atual para ver o valor."
-        />
-        <Button
-          variant="outline"
-          size="sm"
-          className="mt-3 w-full"
-          onClick={() => navigate(month.year, month.month)}
         >
-          Voltar para o mês atual
-        </Button>
+          <Button
+            size="lg"
+            className="mt-2 bg-negative px-6 text-background hover:bg-negative/80"
+            onClick={() => navigate(month.year, month.month)}
+          >
+            Voltar para o mês atual
+          </Button>
+        </EmptyState>
       </section>
     )
   }
@@ -209,20 +209,10 @@ function UsageBar({
         : 0
       : Math.min(100, (spent / allowance) * 100)
   return (
-    <div
-      role="progressbar"
-      aria-valuenow={Math.round(pct)}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted"
-    >
-      <div
-        className={cn(
-          'h-full rounded-full transition-[width]',
-          busted ? 'bg-negative' : 'bg-foreground',
-        )}
-        style={{ width: `${pct}%` }}
-      />
-    </div>
+    <ProgressBar
+      pct={pct}
+      tone={busted ? 'negative' : 'default'}
+      className="mt-1.5"
+    />
   )
 }

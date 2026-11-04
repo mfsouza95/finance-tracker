@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { bucketRest } from '@/lib/money'
 
 import { Money } from './Money'
+import { ProgressBar } from './ProgressBar'
 
 export interface BucketCardProps {
   title: string
@@ -45,21 +46,11 @@ export function BucketCard({
         <Money cents={rest} size="xl" sign="sign" className="pod-metric" />
       </header>
 
-      <div
-        role="progressbar"
-        aria-valuenow={Math.round(pct)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-muted"
-      >
-        <div
-          className={cn(
-            'h-full rounded-full',
-            overspent ? 'bg-negative' : 'bg-foreground',
-          )}
-          style={{ width: `${overspent ? 100 : pct}%` }}
-        />
-      </div>
+      <ProgressBar
+        pct={overspent ? 100 : pct}
+        tone={overspent ? 'negative' : 'default'}
+        className="mt-3"
+      />
 
       <div className="mt-3 flex items-baseline justify-between gap-4">
         {action}

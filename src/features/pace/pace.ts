@@ -3,7 +3,12 @@
 // lexicographically, so no Date/timezone math leaks in.
 
 import type { Buckets } from '@/lib/money'
+import { toISODate } from '@/lib/dates'
 import type { Month } from '@/features/months/hooks'
+
+export function todayISO(now = new Date()): string {
+  return toISODate(now)
+}
 
 export type PaceScope = 'all' | 'essential' | 'fun'
 export type PaceKind = 'day' | 'week'
@@ -47,13 +52,6 @@ export function paceBound(month: Pick<Month, 'year' | 'month' | 'closes_on'>): s
 function utcDay(iso: string): number {
   const [y, m, d] = iso.split('-').map(Number)
   return Date.UTC(y, m - 1, d)
-}
-
-export function todayISO(now = new Date()): string {
-  const y = now.getFullYear()
-  const m = String(now.getMonth() + 1).padStart(2, '0')
-  const d = String(now.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
 }
 
 // Whole days from `from` to bound, inclusive of `from`, clamped to >= 1 so

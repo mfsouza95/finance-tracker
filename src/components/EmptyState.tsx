@@ -3,17 +3,17 @@ import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
 export interface EmptyStateProps {
-  icon?: ReactNode
   title: string
   description?: string
   className?: string
+  children?: ReactNode
 }
 
 export function EmptyState({
-  icon,
   title,
   description,
   className,
+  children,
 }: EmptyStateProps) {
   return (
     <div
@@ -23,13 +23,11 @@ export function EmptyState({
         className,
       )}
     >
-      {icon ? (
-        <div className="text-muted-foreground [&>svg]:size-6">{icon}</div>
-      ) : null}
       <p className="text-sm font-medium">{title}</p>
       {description ? (
         <p className="text-muted-foreground max-w-xs text-sm">{description}</p>
       ) : null}
+      {children}
     </div>
   )
 }

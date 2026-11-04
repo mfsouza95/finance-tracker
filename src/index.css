@@ -237,7 +237,7 @@
 
 /* Dashboard pods: a 3-2-3 layout on one 6-column grid so all rows share
    the same outer edges. Outer pods span 2 cols; the middle row's span 3
-   (1.5x wider) and its row is --dash-mid times taller — the visual
+   (1.5x wider) and its row is taller by the middle factor — the visual
    priority. Below 1500px it collapses to equal columns with auto heights
    (fixed-height logic off). Only two values tune the proportions:
    --dash-rows (keep the middle <= ~1.4) and --dash-min-h. */

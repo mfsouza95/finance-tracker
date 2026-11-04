@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { EmptyState } from '@/components/EmptyState'
 import { Money } from '@/components/Money'
+import { ProgressBar } from '@/components/ProgressBar'
 import { Button } from '@/components/ui/button'
 
 import {
@@ -68,12 +69,7 @@ export function PiggySummaryCard() {
                   </Button>
                   <DeleteFundDialog fund={p} balance={saved} hasSpends={false} />
                 </div>
-                <div className="h-1.5 overflow-hidden rounded-full bg-input">
-                  <div
-                    className="h-full bg-positive transition-all"
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
+                <ProgressBar pct={pct} tone="positive" className="bg-input" />
               </li>
             )
           })}
