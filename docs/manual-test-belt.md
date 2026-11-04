@@ -93,6 +93,7 @@ runs with `supabase db reset` if you want a clean slate.
 - [ ] Piggy/bank deposit → does NOT bust the day's figure; the remaining budget shrinks so the next period (or Recalcular) shows a smaller allowance
 - [ ] Fatura date in the past, month still open → Diário shows the whole remaining budget (days left clamps to 1)
 - [ ] Two open months → pod follows the NEWER one; a same-date entry logged into the older month does NOT lower the pod's numbers
+- [ ] Viewing a month that isn't the pace target (e.g. closed October) → pod shows the empty state; "Voltar para o mês atual" jumps to the latest open month
 - [ ] New day / new Monday → fresh figures derived automatically; reloading mid-period never changes the allowance, only the spent part
 
 ## 8. Multi-user (optional, second browser/incognito)

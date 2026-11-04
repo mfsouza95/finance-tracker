@@ -41,7 +41,7 @@ export function Dashboard() {
         <MonthSummary month={month} />
       </div>
       <div className="dash-pod">
-        <PaceCard />
+        <PaceCard viewedMonth={month} />
       </div>
       <div className="dash-pod">
         <ActiveBankCard month={month} />

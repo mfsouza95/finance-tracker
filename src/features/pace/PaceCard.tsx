@@ -1,13 +1,18 @@
 import { useEffect } from 'react'
 import { RotateCcw } from 'lucide-react'
 
+import { EmptyState } from '@/components/EmptyState'
 import { Money } from '@/components/Money'
 import { Button } from '@/components/ui/button'
 import { monthLabel } from '@/lib/dates'
 import { cn } from '@/lib/utils'
 import { useEntries } from '@/features/entries/hooks'
 import { extrasTotal, useExtras } from '@/features/extras/hooks'
-import { useLatestOpenMonth } from '@/features/months/hooks'
+import {
+  useLatestOpenMonth,
+  type Month,
+} from '@/features/months/hooks'
+import { useSelectedMonth } from '@/features/months/selectedMonth'
 
 import { useEnsurePace, usePaceSnapshots, useRecalcPace } from './hooks'
 import {
@@ -23,8 +28,9 @@ import {
 // Figures are fixed per period (midnight / Monday) snapshots in
 // pace_snapshots; what you see is allowance − already spent in the window,
 // with a bar filling toward 100% of the allowance.
-export function PaceCard() {
+export function PaceCard({ viewedMonth }: { viewedMonth: Month }) {
   const { data: month } = useLatestOpenMonth()
+  const { navigate } = useSelectedMonth()
   const { data: entries } = useEntries(month?.id)
   const { data: extras } = useExtras(month?.id)
   const { data: snapshots } = usePaceSnapshots(month?.id)
@@ -64,6 +70,43 @@ export function PaceCard() {
   }, [month, entries, extras, snapshots, today, monday, extrasCents, ensure])
 
   if (!month) return null
+
+  // The pod's figures belong to the latest open month only — on any other
+  // month show a pointer back instead of foreign numbers.
+  if (viewedMonth.id !== month.id) {
+    return (
+      <section
+        aria-label="Ritmo de gastos"
+        className="flex h-full flex-col rounded-lg border border-border bg-card p-4"
+      >
+        <header className="flex items-center justify-between gap-2">
+          <h2 className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
+            Ritmo —{' '}
+            <span className="capitalize">
+              {monthLabel(month.year, month.month)}
+            </span>
+          </h2>
+        </header>
+        <EmptyState
+          className="mt-3 flex-1"
+          title={
+            viewedMonth.status === 'closed'
+              ? 'Mês já fechado, não possui orçamento semanal e diário.'
+              : `O ritmo é calculado sobre ${monthLabel(month.year, month.month)}.`
+          }
+          description="Volte para o mês atual para ver o valor."
+        />
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-3 w-full"
+          onClick={() => navigate(month.year, month.month)}
+        >
+          Voltar para o mês atual
+        </Button>
+      </section>
+    )
+  }
 
   const spentToday = spentInWindow(monthEntries, 'all', today, today)
   const spentWeek = spentInWindow(monthEntries, 'all', monday, today)
