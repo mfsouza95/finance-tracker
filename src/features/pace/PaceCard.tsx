@@ -127,16 +127,17 @@ export function PaceCard() {
       </div>
 
       <div className="mt-3">
-        <div className="flex items-baseline justify-between gap-2">
-          <span className="text-sm text-muted-foreground">
-            Semanal — resta
-          </span>
-          {semana !== null ? (
-            <Money cents={semana} size="lg" sign="sign" />
-          ) : (
-            <span className="text-lg text-muted-foreground">…</span>
-          )}
-        </div>
+        <p className="text-sm text-muted-foreground">Semanal — resta</p>
+        {semana !== null ? (
+          <Money
+            cents={semana}
+            size="xl"
+            sign="sign"
+            className="block pod-metric"
+          />
+        ) : (
+          <span className="text-2xl font-semibold text-muted-foreground">…</span>
+        )}
         <UsageBar spent={spentWeek} allowance={weekAll?.allowance_cents} />
       </div>
 
