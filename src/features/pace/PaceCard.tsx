@@ -17,6 +17,7 @@ import { useSelectedMonth } from '@/features/months/selectedMonth'
 import { useEnsurePace, usePaceSnapshots, useRecalcPace } from './hooks'
 import {
   mondayOf,
+  paceLeft,
   spentInWindow,
   todayISO,
   type PaceKind,
@@ -110,18 +111,32 @@ export function PaceCard({ viewedMonth }: { viewedMonth: Month }) {
 
   const spentToday = spentInWindow(monthEntries, 'all', today, today)
   const spentWeek = spentInWindow(monthEntries, 'all', monday, today)
-  const hoje = dayAll ? dayAll.allowance_cents - spentToday : null
-  const semana = weekAll ? weekAll.allowance_cents - spentWeek : null
+  const hoje = dayAll
+    ? paceLeft(dayAll.allowance_cents, spentToday, dayAll.spent_baseline_cents)
+    : null
+  const semana = weekAll
+    ? paceLeft(
+        weekAll.allowance_cents,
+        spentWeek,
+        weekAll.spent_baseline_cents,
+      )
+    : null
   const essHoje =
     dayEss === undefined
       ? null
-      : dayEss.allowance_cents -
-        spentInWindow(monthEntries, 'essential', today, today)
+      : paceLeft(
+          dayEss.allowance_cents,
+          spentInWindow(monthEntries, 'essential', today, today),
+          dayEss.spent_baseline_cents,
+        )
   const funHoje =
     dayFun === undefined
       ? null
-      : dayFun.allowance_cents -
-        spentInWindow(monthEntries, 'fun', today, today)
+      : paceLeft(
+          dayFun.allowance_cents,
+          spentInWindow(monthEntries, 'fun', today, today),
+          dayFun.spent_baseline_cents,
+        )
 
   return (
     <section
@@ -164,7 +179,7 @@ export function PaceCard({ viewedMonth }: { viewedMonth: Month }) {
           <span className="text-2xl font-semibold text-muted-foreground">…</span>
         )}
         <UsageBar
-          spent={spentToday}
+          spent={spentToday - (dayAll?.spent_baseline_cents ?? 0)}
           allowance={dayAll?.allowance_cents}
         />
       </div>
@@ -181,7 +196,10 @@ export function PaceCard({ viewedMonth }: { viewedMonth: Month }) {
         ) : (
           <span className="text-2xl font-semibold text-muted-foreground">…</span>
         )}
-        <UsageBar spent={spentWeek} allowance={weekAll?.allowance_cents} />
+        <UsageBar
+          spent={spentWeek - (weekAll?.spent_baseline_cents ?? 0)}
+          allowance={weekAll?.allowance_cents}
+        />
       </div>
 
       <div className="mt-auto pt-3 text-xs text-muted-foreground">
