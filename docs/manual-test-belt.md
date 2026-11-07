@@ -87,7 +87,7 @@ runs with `supabase db reset` if you want a clean slate.
 - [ ] Open a month → Ritmo card appears with the month label, Diário and Semanal figures, each with a usage bar
 - [ ] Month with no fatura date → allowance divides by days to the label month end; set "Fechamento da fatura" → next period (or Recalcular) uses it as the bound
 - [ ] Log entries → the figures drop and the bars fill, but the underlying allowance stays fixed for the day/week
-- [ ] Recalcular → all figures recompute from the CURRENT remaining budget (a busted limit can show negative immediately)
+- [ ] Recalcular → all figures recompute from the CURRENT remaining budget and the period counter restarts at the new allowance (a big purchase is absorbed into a smaller daily share, not shown as instant debt); only spend logged AFTER the recalc counts against it
 - [ ] Spend past the daily figure → Diário goes negative in red and its bar fills solid red
 - [ ] Caption line → per-bucket daily figures (Essencial hoje / Lazer hoje) update on their own
 - [ ] Piggy/bank deposit → does NOT bust the day's figure; the remaining budget shrinks so the next period (or Recalcular) shows a smaller allowance

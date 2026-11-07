@@ -4,7 +4,7 @@ create extension if not exists pgtap;
 
 begin;
 
-select plan(7);
+select plan(9);
 
 insert into auth.users
   (instance_id, id, aud, role, email, encrypted_password,
@@ -50,19 +50,29 @@ select is(
   (select allowance_cents from public.pace_snapshots where kind = 'day'),
   10000::bigint, 'ignore-duplicates upsert keeps the first allowance');
 
--- Recalc semantics: overwriting upsert replaces the figure.
+select is(
+  (select spent_baseline_cents from public.pace_snapshots where kind = 'day'),
+  0::bigint, 'spent baseline defaults to zero');
+
+-- Recalc semantics: overwriting upsert replaces figure AND baseline.
 insert into public.pace_snapshots
-  (month_id, kind, scope, period_start, user_id, allowance_cents)
+  (month_id, kind, scope, period_start, user_id,
+   allowance_cents, spent_baseline_cents)
 select m.id, 'day', 'all', '2026-11-02',
-       'a8a8a8a8-0000-0000-0000-00000000000a', 5000
+       'a8a8a8a8-0000-0000-0000-00000000000a', 5000, 7000
 from public.months m where m.year = 2026 and m.month = 11
 on conflict (month_id, kind, scope, period_start)
   do update set allowance_cents = excluded.allowance_cents,
+                spent_baseline_cents = excluded.spent_baseline_cents,
                 computed_at = now();
 
 select is(
   (select allowance_cents from public.pace_snapshots where kind = 'day'),
   5000::bigint, 'recalc upsert overwrites the allowance');
+
+select is(
+  (select spent_baseline_cents from public.pace_snapshots where kind = 'day'),
+  7000::bigint, 'recalc upsert stamps the spent baseline');
 
 -- Scope is part of the key: a different scope gets its own row.
 insert into public.pace_snapshots

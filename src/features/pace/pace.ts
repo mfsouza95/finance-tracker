@@ -85,6 +85,18 @@ export function paceAllowance(remainingCents: number, periodsLeft: number): numb
   return Math.floor(remainingCents / periodsLeft)
 }
 
+// Leftover of a period's allowance: allowance minus spending past the
+// baseline. Recalc stamps the baseline with what was already spent, so its
+// new figure starts fresh — the spend is absorbed into the smaller
+// allowance instead of being charged against it a second time.
+export function paceLeft(
+  allowanceCents: number,
+  spentCents: number,
+  baselineCents = 0,
+): number {
+  return allowanceCents - (spentCents - baselineCents)
+}
+
 // Sum of scope entries with paid_on inside [from, to] (inclusive, string
 // compare on ISO dates). Fund deposits (fund_flow='in') are NOT spending:
 // they already shrink the remaining budget via scopeSpentCents, which is

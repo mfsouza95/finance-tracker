@@ -14,6 +14,7 @@ import {
   paceBound,
   scopeBudgetCents,
   scopeSpentCents,
+  spentInWindow,
   todayISO,
   weeksLeft,
   type PaceScope,
@@ -39,13 +40,16 @@ export function usePaceSnapshots(monthId: string | undefined) {
 const SCOPES: PaceScope[] = ['all', 'essential', 'fun']
 
 // Compute the current day/week rows for every scope from live month data —
-// shared by the first-write-wins ensure and the overwriting recalc.
+// shared by the first-write-wins ensure and the overwriting recalc. Only
+// recalc stamps spent_baseline_cents: its new figure must start counting
+// from zero instead of re-charging what was already spent in the window.
 function currentRows(
   month: Month,
   entries: EntryWithCategory[],
   extrasCents: number,
   userId: string,
   today: string,
+  withBaseline: boolean,
 ): TablesInsert<'pace_snapshots'>[] {
   const bound = paceBound(month)
   const buckets = computeBuckets(month.net_income_cents, {
@@ -67,6 +71,9 @@ function currentRows(
         period_start: today,
         user_id: userId,
         allowance_cents: paceAllowance(remaining, daysLeft(bound, today)),
+        spent_baseline_cents: withBaseline
+          ? spentInWindow(entries, scope, today, today)
+          : 0,
       },
       {
         month_id: month.id,
@@ -75,6 +82,9 @@ function currentRows(
         period_start: monday,
         user_id: userId,
         allowance_cents: paceAllowance(remaining, weeksLeft(bound, monday)),
+        spent_baseline_cents: withBaseline
+          ? spentInWindow(entries, scope, monday, today)
+          : 0,
       },
     )
   }
@@ -107,6 +117,7 @@ export function useEnsurePace() {
         vars.extrasCents,
         session.user.id,
         today,
+        false,
       ).filter((r) => !have.has(`${r.scope}:${r.kind}:${r.period_start}`))
       if (!rows.length) return
       const { error } = await supabase
@@ -134,6 +145,7 @@ export function useRecalcPace() {
         vars.extrasCents,
         session.user.id,
         todayISO(),
+        true,
       )
       const { error } = await supabase
         .from('pace_snapshots')

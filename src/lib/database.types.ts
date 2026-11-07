@@ -158,13 +158,13 @@ isOneToOne: false
                   ]
                 },"pace_snapshots": {
                   Row: {
-                    "allowance_cents": number,"computed_at": string,"kind": string,"month_id": string,"period_start": string,"scope": string,"user_id": string
+                    "allowance_cents": number,"computed_at": string,"kind": string,"month_id": string,"period_start": string,"scope": string,"spent_baseline_cents": number,"user_id": string
                   }
                   Insert: {
-                    "allowance_cents": number,"computed_at"?: string,"kind": string,"month_id": string,"period_start": string,"scope": string,"user_id": string
+                    "allowance_cents": number,"computed_at"?: string,"kind": string,"month_id": string,"period_start": string,"scope": string,"spent_baseline_cents"?: number,"user_id": string
                   }
                   Update: {
-                    "allowance_cents"?: number,"computed_at"?: string,"kind"?: string,"month_id"?: string,"period_start"?: string,"scope"?: string,"user_id"?: string
+                    "allowance_cents"?: number,"computed_at"?: string,"kind"?: string,"month_id"?: string,"period_start"?: string,"scope"?: string,"spent_baseline_cents"?: number,"user_id"?: string
                   }
                   Relationships: [
                     {

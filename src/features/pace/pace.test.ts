@@ -7,6 +7,7 @@ import {
   mondayOf,
   paceAllowance,
   paceBound,
+  paceLeft,
   scopeBudgetCents,
   scopeSpentCents,
   spentInWindow,
@@ -110,6 +111,16 @@ describe('scopeSpentCents / spentInWindow', () => {
     expect(spentInWindow(entries, 'essential', '2026-11-02', '2026-11-08')).toBe(100)
     // window edges are inclusive
     expect(spentInWindow(entries, 'all', '2026-10-30', '2026-11-05')).toBe(1000)
+  })
+  it('paceLeft subtracts only spend past the baseline', () => {
+    // plain ensure row (baseline 0) behaves like allowance − spent
+    expect(paceLeft(10_000, 3_000)).toBe(7_000)
+    expect(paceLeft(10_000, 12_000)).toBe(-2_000)
+    // recalc stamps the baseline: the display restarts at the allowance
+    // and new spending counts down from it
+    expect(paceLeft(5_000, 20_000, 20_000)).toBe(5_000)
+    expect(paceLeft(5_000, 21_500, 20_000)).toBe(3_500)
+    expect(paceLeft(5_000, 30_000, 20_000)).toBe(-5_000)
   })
   it('ignores fund deposits (fund_flow=in) but keeps them in month spent', () => {
     const withDeposit = [
